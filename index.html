@@ -1,0 +1,1750 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ff85a2">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23ff85a2'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='42' fill='white'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+    <title>Portfolio Studio</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --accent: #ff85a2;
+            --accent-soft: #ffe4e9;
+            --ink: #38323a;
+            --muted: #716974;
+            --line: #eadfe4;
+            --surface: #fff;
+            --canvas: #fff8fa;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: #f7f3f5;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; }
+        button, input, select, textarea { font: inherit; }
+        button, .button {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 16px;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover, .button:hover { filter: brightness(.95); }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid #6c3e4d;
+            outline-offset: 2px;
+        }
+        button.secondary, .button.secondary { background: #f0e9ed; color: var(--ink); }
+        button.danger { background: #a22d45; }
+        button:disabled { opacity: .55; cursor: not-allowed; }
+        a { color: #9c3d5a; }
+        .shell { max-width: 1280px; margin: auto; padding: 30px 22px 80px; }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-mark {
+            width: 42px; height: 42px; display: grid; place-items: center;
+            border-radius: 14px; background: var(--accent); color: white; font-size: 22px;
+        }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 8px; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+        h2 { font-size: 1.35rem; }
+        .brand h1 { margin: 0; font-size: 1.1rem; }
+        .brand p { margin: 2px 0 0; color: var(--muted); font-size: .85rem; }
+        .panel {
+            border: 1px solid var(--line); border-radius: 18px;
+            background: var(--surface); padding: clamp(20px, 3vw, 34px);
+            box-shadow: 0 12px 35px #4521370c;
+        }
+        .welcome { max-width: 820px; margin: 8vh auto 0; }
+        .lead { color: var(--muted); line-height: 1.65; max-width: 70ch; }
+        .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 28px 0; }
+        .choice {
+            min-height: 150px; padding: 22px; background: var(--canvas);
+            border: 1px solid var(--line); border-radius: 14px; text-align: left;
+            color: var(--ink); display: block;
+        }
+        .choice strong { display: block; font-size: 1.1rem; margin-bottom: 8px; }
+        .choice span { color: var(--muted); font-weight: 400; line-height: 1.5; }
+        .note, .warning, .success {
+            border-radius: 12px; padding: 14px 16px; line-height: 1.55; margin: 16px 0;
+        }
+        .note { background: #f5f1f3; color: #514a52; }
+        .warning { background: #fff5e3; border: 1px solid #efd49e; color: #694b16; }
+        .success { background: #edf9f1; border: 1px solid #b9e2c4; color: #245c34; }
+        .small { color: var(--muted); font-size: .88rem; line-height: 1.5; }
+        .steps-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr); gap: 24px; align-items: start; }
+        .wizard-panel { min-width: 0; }
+        .step-heading { margin-bottom: 20px; }
+        .step-heading p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
+        .step-indicator { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+        .step-dot { border: 0; padding: 7px 10px; background: #f1ecef; border-radius: 99px; font-size: .78rem; color: var(--muted); }
+        .step-dot.active { background: var(--accent-soft); color: #6a293e; font-weight: 800; }
+        .step-dot.complete { color: #563545; }
+        .field { display: grid; gap: 7px; margin: 15px 0; }
+        .field > label, .field-label { font-weight: 700; font-size: .93rem; }
+        input:not([type=checkbox]):not([type=radio]), select, textarea {
+            width: 100%; padding: 11px 12px; border: 1px solid #d8cbd2; border-radius: 9px;
+            color: var(--ink); background: white;
+        }
+        textarea { resize: vertical; min-height: 100px; }
+        input[type=color] { width: 72px; height: 44px; padding: 3px; border: 1px solid var(--line); border-radius: 8px; }
+        input[type=checkbox], input[type=radio] { accent-color: var(--accent); width: 18px; height: 18px; vertical-align: middle; }
+        .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .inline-check { display: flex; align-items: flex-start; gap: 9px; line-height: 1.45; }
+        .inline-check input { flex: 0 0 auto; margin: 2px 0 0; }
+        .card-list { display: grid; gap: 12px; }
+        .form-card { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fffcfd; }
+        .form-card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .form-card-head strong { font-size: .92rem; }
+        .form-card .field { margin: 10px 0; }
+        .form-card .field:last-child { margin-bottom: 0; }
+        .tiny-actions { display: flex; gap: 5px; }
+        .tiny-actions button { padding: 6px 9px; font-size: .8rem; }
+        .emoji-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .emoji-row button { padding: 5px 8px; background: #f0e9ed; color: var(--ink); font-size: .83rem; }
+        .wizard-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+        .wizard-actions .right { display: flex; gap: 9px; }
+        .preview-sticky { position: sticky; top: 18px; }
+        .preview-title { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
+        .preview-title h2 { margin: 0; }
+        .preview-frame { padding: 14px; border-radius: 14px; background: #eee8eb; max-height: calc(100vh - 120px); overflow: auto; }
+        #portfolio-preview { max-width: 540px; margin: 0 auto; }
+        .preview-frame[data-focus] [data-preview-part] { transition: opacity .2s ease, filter .2s ease; }
+        .preview-frame[data-focus] [data-preview-part]:not([data-preview-part~="all"]):not([data-preview-part~="profile"]):not([data-preview-part~="identity"]):not([data-preview-part~="stats"]):not([data-preview-part~="badges"]):not([data-preview-part~="bio"]):not([data-preview-part~="socials"]):not([data-preview-part~="timezone"]):not([data-preview-part~="interests"]):not([data-preview-part~="extras"]) { opacity: .2; }
+        .preview-frame[data-focus="profile"] [data-preview-part]:not([data-preview-part~="profile"]),
+        .preview-frame[data-focus="identity"] [data-preview-part]:not([data-preview-part~="identity"]),
+        .preview-frame[data-focus="stats"] [data-preview-part]:not([data-preview-part~="stats"]),
+        .preview-frame[data-focus="badges"] [data-preview-part]:not([data-preview-part~="badges"]),
+        .preview-frame[data-focus="bio"] [data-preview-part]:not([data-preview-part~="bio"]),
+        .preview-frame[data-focus="socials"] [data-preview-part]:not([data-preview-part~="socials"]),
+        .preview-frame[data-focus="timezone"] [data-preview-part]:not([data-preview-part~="timezone"]),
+        .preview-frame[data-focus="interests"] [data-preview-part]:not([data-preview-part~="interests"]),
+        .preview-frame[data-focus="extras"] [data-preview-part]:not([data-preview-part~="extras"]) { opacity: .18; filter: grayscale(.65); }
+        .wizard-question { max-width: 52ch; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: #fffcfd; }
+        .wizard-question > .field:first-child { margin-top: 0; }
+        .editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 22px; align-items: start; }
+        .editor-preview { position: sticky; top: 18px; }
+        .editor-preview .preview-frame { max-height: calc(100vh - 115px); }
+        .editor-tools { display: grid; gap: 16px; }
+        .editor-toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .editor-items { display: grid; gap: 9px; }
+        .editor-item { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: #fffcfd; }
+        .editor-item[draggable="true"] { cursor: grab; }
+        .editor-item.dragging { opacity: .4; }
+        .editor-item .drag-handle { color: var(--muted); font-size: 1.15rem; }
+        .editor-item .item-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        .editor-item.drop-target { border-color: var(--accent); background: var(--accent-soft); }
+        .editor-item button { padding: 7px 10px; }
+        .editor-item button.secondary { background: #f0e9ed; }
+        .editor-empty { padding: 16px; border: 1px dashed #d8cbd2; border-radius: 11px; color: var(--muted); text-align: center; }
+        .modal-form { display: grid; gap: 12px; }
+        .modal-form .field { margin: 0; }
+        .save-float {
+            position: fixed; z-index: 20; top: 17px; right: max(20px, calc((100vw - 1280px) / 2));
+            box-shadow: 0 5px 18px #3a172b38;
+        }
+        .hidden { display: none !important; }
+        .status { min-height: 1.4em; margin: 12px 0; font-size: .92rem; }
+        .status.error { color: #a22d45; }
+        .status.ok { color: #28723c; }
+        .repo-summary { overflow-wrap: anywhere; }
+        dialog {
+            width: min(680px, calc(100vw - 28px)); max-height: 88vh; overflow: auto;
+            border: 1px solid var(--line); border-radius: 18px; padding: 25px;
+            color: var(--ink); box-shadow: 0 20px 70px #1f101b55;
+        }
+        dialog::backdrop { background: #21131dcc; backdrop-filter: blur(2px); }
+        dialog h2 { margin: 0 0 12px; }
+        dialog ol { padding-left: 22px; line-height: 1.55; }
+        dialog li { margin: 9px 0; }
+        .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .portfolio-page {
+            --p-accent: #ff85a2; --p-soft: #ffe4e9; --p-ink: #4a4a4a;
+            color: var(--p-ink); background: #fffafa; padding: 18px;
+            border-radius: 18px; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .portfolio-page * { box-sizing: border-box; }
+        .portfolio-card {
+            --card-padding: 25px;
+            max-width: 650px; margin: 0 auto 15px; padding: var(--card-padding); overflow: hidden;
+            border-radius: 22px; background: white; text-align: center;
+            box-shadow: 0 12px 28px color-mix(in srgb, var(--p-accent) 15%, transparent);
+        }
+        .portfolio-banner { position: relative; height: 180px; margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) -65px; overflow: hidden; }
+        .portfolio-banner img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center var(--banner-position, 45%); -webkit-user-drag: none; user-select: none; }
+        .portfolio-banner::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, transparent, white); pointer-events: none; }
+        .portfolio-page h1, .portfolio-page h2 { color: var(--p-accent); }
+        .portfolio-page h1 { font-size: 2rem; margin: 12px 0 5px; overflow-wrap: anywhere; }
+        .portfolio-photos { position: relative; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 110px; }
+        .portfolio-photos.align-left { justify-content: flex-start; }
+        .portfolio-photos.align-right { justify-content: flex-end; }
+        .portfolio-photos img {
+            width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+            border: 4px solid white; box-shadow: 0 3px 12px #3333;
+        }
+        .portfolio-photos.carousel { display: block; width: min(390px, 100%); min-height: 0; aspect-ratio: 3 / 1; margin: auto; overflow: hidden; touch-action: pan-y; user-select: none; }
+        .portfolio-photos.carousel img { position: absolute; top: 0; width: 33.3333%; height: 100%; aspect-ratio: 1; border: 0; border-radius: 50%; object-fit: cover; cursor: grab; -webkit-user-drag: none; }
+        .portfolio-photos.carousel .pfp-left { left: 0; opacity: .5; transform: scale(.75); }
+        .portfolio-photos.carousel .pfp-center { left: 33.333%; opacity: 1; transform: scale(1); z-index: 2; }
+        .portfolio-photos.carousel .pfp-right { left: 66.667%; opacity: .5; transform: scale(.75); }
+        .portfolio-stat[data-hint] { cursor: help; }
+        .portfolio-stat[data-hint]:hover::after, .portfolio-stat[data-hint]:focus-visible::after {
+            content: attr(data-hint); position: absolute; z-index: 5; left: 50%; bottom: calc(100% + 8px);
+            transform: translateX(-50%); padding: 6px 12px; border-radius: 8px;
+            background: var(--p-ink); color: #fff; font-size: .78rem; font-weight: 400;
+            white-space: nowrap; box-shadow: 0 3px 10px #0002;
+        }
+        .portfolio-status { color: #8f6c77; margin: 0 0 14px; }
+        .portfolio-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
+        .portfolio-stat { position: relative; border-radius: 10px; padding: 9px; background: var(--p-soft); font-size: .88rem; font-weight: 650; }
+        .portfolio-badges { display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+        .portfolio-badges img { width: 30px; height: 30px; object-fit: contain; }
+        .portfolio-bio { border-left: 4px solid var(--p-accent); padding: 14px; background: #fffcfc; border-radius: 8px; text-align: left; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .portfolio-socials { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .portfolio-socials a, .portfolio-button {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            padding: 8px 13px; border-radius: 99px; color: white; background: var(--p-accent);
+            text-decoration: none; font-weight: 700; overflow-wrap: anywhere;
+        }
+        .portfolio-socials img { width: 22px; height: 22px; object-fit: contain; }
+        .portfolio-section { text-align: left; }
+        .portfolio-section h2 { font-size: 1.2rem; border-bottom: 2px solid var(--p-soft); padding-bottom: 7px; }
+        .portfolio-time { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 16px; padding: 8px 12px; background: #fffcfc; border: 1px solid var(--p-soft); border-radius: 20px; }
+        .portfolio-time-info { text-align: left; }
+        .portfolio-time-info h3 { margin: 0; color: var(--p-accent); font-size: 1.2rem; }
+        .portfolio-time-zone { color: #9c7783; font-size: .8rem; }
+        .hybrid-clock { position: relative; flex: 0 0 70px; width: 70px; height: 70px; border: 2px solid var(--p-soft); border-radius: 50%; background: #fff; box-shadow: 0 4px 10px color-mix(in srgb,var(--p-accent) 9%,transparent); }
+        .hybrid-hand { position: absolute; top: 50%; height: 2px; border-radius: 2px; transform-origin: 100%; }
+        .h-hour { left: 25%; width: 25%; height: 3px; background: var(--p-ink); }
+        .h-min { left: 15%; width: 35%; background: #888; }
+        .h-sec { left: 12%; width: 38%; height: 1px; background: var(--p-accent); }
+        .hybrid-digital { position: absolute; z-index: 3; top: 40%; left: 50%; transform: translateX(-50%); padding: 2px 4px; border-radius: 4px; background: #fffdfddd; color: var(--p-ink); font: bold .75rem monospace; }
+        .portfolio-interest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+        .portfolio-interest {
+            min-height: 145px; display: flex; flex-direction: column; justify-content: end;
+            padding: 10px; color: white; border-radius: 10px; overflow: hidden;
+            background: linear-gradient(160deg, var(--p-soft), var(--p-accent));
+            background-position: center; background-size: cover; text-shadow: 0 1px 5px #000b;
+        }
+        @media (max-width: 560px) { .portfolio-card { --card-padding: 22px; } .portfolio-banner { height: auto; aspect-ratio: 2.3 / 1; } }
+        .portfolio-interest strong { overflow-wrap: anywhere; }
+        .portfolio-interest small { margin-top: 3px; }
+        .portfolio-extra { text-align: left; line-height: 1.55; overflow-wrap: anywhere; }
+        .portfolio-extra img { display: block; max-width: 100%; max-height: 220px; object-fit: cover; border-radius: 10px; margin: 10px auto; }
+        .emoji-picker { margin-top: 4px; }
+        @media (max-width: 850px) {
+            .steps-layout { grid-template-columns: 1fr; }
+            .preview-sticky { position: static; }
+            .preview-frame { max-height: none; }
+            .editor-layout { grid-template-columns: 1fr; }
+            .editor-preview { position: static; }
+            .editor-preview .preview-frame { max-height: none; }
+            .save-float { top: auto; bottom: 14px; right: 14px; }
+        }
+        @media (max-width: 560px) {
+            .shell { padding: 18px 12px 82px; }
+            .choice-grid, .field-row { grid-template-columns: 1fr; }
+            .portfolio-stats { grid-template-columns: 1fr; }
+            .topbar { margin-bottom: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">✦</div>
+                <div><h1>Portfolio Studio</h1><p>A guided editor for your personal page</p></div>
+            </div>
+        </header>
+
+        <section id="welcome-view" class="welcome panel">
+            <h1>Make a portfolio that feels like you.</h1>
+            <p class="lead">Start a new portfolio or edit one previously created with Portfolio Studio. Your changes are previewed as you work. Publishing sends the finished <code>index.html</code> directly to a repository you choose.</p>
+            <div class="choice-grid">
+                <button class="choice" type="button" data-mode="new">
+                    <strong>Set up a new portfolio</strong>
+                    <span>Connect an empty repository and build your page step by step.</span>
+                </button>
+                <button class="choice" type="button" data-mode="edit">
+                    <strong>Edit an existing portfolio</strong>
+                    <span>Open a portfolio made by this editor and update its supported fields.</span>
+                </button>
+            </div>
+            <div class="warning"><strong>Before connecting GitHub:</strong> you will need your own repository and a Fine-grained personal access token. The editor never saves the token in browser storage, but the token is necessarily present in this page's memory while you use it.</div>
+            <p class="small">This tool asks you to follow GitHub's <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct" target="_blank" rel="noopener noreferrer">Community Code of Conduct</a>. The notice records your agreement; it cannot monitor or guarantee anyone's conduct.</p>
+        </section>
+
+        <section id="connect-view" class="panel hidden" aria-labelledby="connect-title">
+            <h1 id="connect-title">Connect your repository</h1>
+            <p class="lead" id="connect-intro"></p>
+            <div class="note repo-summary">
+                <strong>Recommended repository:</strong> create one on your own GitHub account, with a name such as <code>portfolio</code> or <code>me</code>. The name appears in the Pages address (usually <code>username.github.io/repository-name/</code>). For a new portfolio, leave it empty except for an optional README.
+            </div>
+            <div class="field">
+                <label for="repository">Repository name</label>
+                <input id="repository" autocomplete="off" placeholder="portfolio" required>
+                <span class="small">Enter only the repository name, not a URL. The repository must belong to the GitHub account associated with your token.</span>
+            </div>
+            <div class="field">
+                <label for="pat">Fine-grained personal access token</label>
+                <input id="pat" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" required>
+                <span class="small">This page keeps it in memory only. Refreshing or closing the page clears it. Never paste a token into a public/shared computer.</span>
+            </div>
+            <label class="inline-check">
+                <input id="pages-permission" type="checkbox">
+                <span>I separately granted <strong>Pages: read and write</strong> for this repository. Try to enable GitHub Pages after publishing. This is optional; without it, set Pages up manually.</span>
+            </label>
+            <p class="small">The minimum token permissions for saving are <strong>Metadata: read-only</strong> and <strong>Contents: read and write</strong>, restricted to this one repository, with an expiry no longer than 24 hours. Pages automation additionally needs Pages read/write. Do not grant account-wide access or extra permissions.</p>
+            <div class="warning"><strong>Important limitation:</strong> GitHub does not let this page inspect a PAT's expiry, repository allow-list, or full permission list. It can check the token against the selected account/repository and whether that repository is writable, but it cannot prove the settings above or reliably distinguish an over-scoped token. Continue only after checking those settings yourself. If you made a broad or long-lived token, revoke it in GitHub and make a restricted one instead.</div>
+            <div class="row">
+                <a class="button secondary" href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">Open PAT settings ↗</a>
+                <button id="connect-github" type="button">Verify access</button>
+                <button id="back-home" class="secondary" type="button">Back</button>
+            </div>
+            <p id="connect-status" class="status" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="wizard-view" class="hidden">
+            <button id="save-button" class="save-float" type="button">Save to GitHub</button>
+            <button id="wizard-editor-button" class="save-float secondary hidden" style="right:auto;left:max(20px,calc((100vw - 1280px) / 2))" type="button">Back to editor</button>
+            <div class="steps-layout">
+                <section class="panel wizard-panel" aria-live="polite">
+                    <nav class="step-indicator" id="step-indicator" aria-label="Setup steps"></nav>
+                    <div id="wizard-content"></div>
+                </section>
+                <aside class="panel preview-sticky">
+                    <div class="preview-title"><h2>Live preview</h2><span class="small">Updates as you edit</span></div>
+                    <div class="preview-frame" id="wizard-preview-frame"><div id="portfolio-preview"></div></div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="editor-view" class="hidden">
+            <button id="editor-save-button" class="save-float" type="button">Save to GitHub</button>
+            <div class="editor-toolbar panel">
+                <div><h1>Your portfolio</h1><p class="small repo-summary" id="editor-repository"></p></div>
+                <div class="row"><button id="edit-details-button" class="secondary" type="button">Edit profile details</button><button id="editor-add-text" type="button">+ Text container</button><button id="editor-add-link" class="secondary" type="button">+ Link button</button><button id="editor-add-image" class="secondary" type="button">+ Image</button></div>
+            </div>
+            <div class="editor-layout" style="margin-top:20px">
+                <section class="panel editor-tools">
+                    <div><h2>Page containers</h2><p class="small">Drag standalone containers to reorder. Use Edit to change one, or remove it from the page. The main profile and optional sections keep their standard positions.</p></div>
+                    <div id="editor-items" class="editor-items"></div>
+                </section>
+                <aside class="panel editor-preview">
+                    <div class="preview-title"><h2>Full page preview</h2><span class="small">Your current portfolio</span></div>
+                    <div class="preview-frame"><div id="editor-preview"></div></div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="consent-dialog" aria-labelledby="consent-title">
+        <h2 id="consent-title">Before you use a GitHub token</h2>
+        <p>A personal access token (PAT) is a secret that lets an application act on GitHub as you, within the permissions you grant. Anyone who obtains it may use those permissions until it expires or you revoke it. This editor sends it only to GitHub's API and does not intentionally store it, but a browser-based tool cannot protect it from a compromised device, browser extension, or modified page.</p>
+        <ol>
+            <li>Create a repository <strong>on your own GitHub account</strong>. For a new portfolio, use an empty repository (an optional README is okay). A name like <code>portfolio</code> or <code>me</code> affects the final Pages URL.</li>
+            <li>In <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">GitHub Fine-grained personal access token settings</a>, create a Fine-grained token, set its expiration to <strong>at most 24 hours</strong>, and select only this one repository.</li>
+            <li>Grant only <strong>Metadata: read-only</strong> and <strong>Contents: read and write</strong>. If you want this tool to configure Pages, also grant <strong>Pages: read and write</strong>; otherwise configure Pages yourself after publishing.</li>
+            <li>Never grant access to all repositories, account permissions, or unrelated permissions. If a token is broader or lasts longer than intended, revoke it and create another one. You can revoke it at <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">PAT settings</a>.</li>
+        </ol>
+        <div class="warning">GitHub's API does not expose enough token metadata for this page to enforce the expiry, repository restriction, or exact permission checks. The page will verify the selected repository is accessible and writable; <strong>you are responsible for confirming the PAT settings yourself</strong>. No token is stored across a refresh.</div>
+        <label class="inline-check"><input id="terms-accept" type="checkbox"><span>I understand how this PAT works, will use a Fine-grained token with the restricted settings above, will follow GitHub's <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct" target="_blank" rel="noopener noreferrer">Community Code of Conduct</a>, and accept that this tool will use my token to update only the repository I select.</span></label>
+        <div class="dialog-actions">
+            <button id="cancel-consent" class="secondary" type="button">Cancel</button>
+            <button id="accept-consent" type="button" disabled>Continue to setup</button>
+        </div>
+    </dialog>
+
+    <dialog id="save-dialog" aria-labelledby="save-title">
+        <h2 id="save-title">Confirm publishing</h2>
+        <p id="save-message">By confirming, you accept that this tool will use your PAT to add or upload changes to the repository selected for this portfolio. Do you wish to proceed?</p>
+        <div class="warning">The token is sent to GitHub to commit your portfolio. Review the preview and selected repository before continuing.</div>
+        <div class="dialog-actions">
+            <button id="cancel-save" class="secondary" type="button">Cancel</button>
+            <button id="confirm-save" type="button">Confirm and publish</button>
+        </div>
+        <p id="save-status" class="status" role="status" aria-live="polite"></p>
+    </dialog>
+
+    <dialog id="container-dialog" aria-labelledby="container-dialog-title">
+        <h2 id="container-dialog-title">Edit container</h2>
+        <form id="container-form" class="modal-form"></form>
+        <div class="dialog-actions">
+            <button id="cancel-container" class="secondary" type="button">Cancel</button>
+            <button id="save-container" type="button">Save container</button>
+        </div>
+    </dialog>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const BADGES = [
+                { name: "Trans-Feminine", path: "Files/Badges/Tf.svg" },
+                { name: "Can Speak English", path: "Files/Badges/Eng.svg" },
+                { name: "Can Speak Dutch", path: "Files/Badges/NL.svg" },
+                { name: "Hollow Knight", path: "Files/Badges/HS.svg" }
+            ];
+            const STEPS = [
+                { id: "accent", title: "Accent colour", description: "Choose a favourite colour. It changes the portfolio's buttons, highlights, and section accents." },
+                { id: "profile", title: "Profile images", description: "Add an optional wide banner and one picture or a small carousel. Images are embedded in the portfolio when you publish." },
+                { id: "identity", title: "Identity and stats", description: "Choose your display name and add any stat bars you like. The examples are suggestions, not requirements. Date stats show an age/distance hint on hover." },
+                { id: "badges", title: "Badges", description: "Choose any of the included badges to show under your stats. You can skip all of them." },
+                { id: "bio", title: "About you", description: "Write the short bio shown in the profile card. Use the emoji buttons to insert familiar :emoji_name: aliases." },
+                { id: "socials", title: "Social links", description: "Optional links to your profiles. Only secure https:// links are published. Custom icon URLs are optional." },
+                { id: "timezone", title: "Timezone", description: "Optional. Add a live local clock. Confirm that the displayed time matches your current time in the selected timezone." },
+                { id: "interests", title: "Interests", description: "Optional vertical image cards, grouped by categories such as Games I own, Hobbies, or Communities." },
+                { id: "extras", title: "Extra containers", description: "Add simple text, links, or images below the main profile. Remove or reorder them with the controls." }
+            ];
+            const DEFAULTS = {
+                accent: "#ff85a2",
+                profile: { type: "carousel", alignment: "center", images: [], banner: { data: "", alt: "", positionY: 45 } },
+                name: "",
+                status: "",
+                stats: [
+                    { label: "Pronouns", type: "text", value: "" },
+                    { label: "Birthday", type: "date", value: "", prefix: "" },
+                    { label: "Gender", type: "text", value: "" },
+                    { label: "Relationship status", type: "text", value: "" }
+                ],
+                badges: [],
+                bio: "",
+                socials: [],
+                timezone: { enabled: false, zone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC", confirmedTime: "" },
+                interests: { categories: "Games I own, Hobbies I like, Communities I'm in", items: [] },
+                extras: []
+            };
+            const EMOJIS = {
+                sparkles: "✨", heart: "❤️", wave: "👋", smile: "😊", star: "⭐",
+                art: "🎨", music: "🎵", game: "🎮", cat: "🐈", flower: "🌸"
+            };
+            const PORTFOLIO_CSS = `
+                *{box-sizing:border-box}body{margin:0;padding:24px;background:#fffafa;color:#4a4a4a;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+                .portfolio-page{--p-accent:#ff85a2;--p-soft:#ffe4e9;max-width:740px;margin:auto}
+                .portfolio-card{--card-padding:32px;margin:0 auto 18px;padding:var(--card-padding);overflow:hidden;border-radius:26px;background:#fff;text-align:center;box-shadow:0 12px 30px color-mix(in srgb,var(--p-accent) 15%,transparent)}
+                .portfolio-banner{position:relative;height:230px;margin:calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) -75px;overflow:hidden}.portfolio-banner img{display:block;width:100%;height:100%;object-fit:cover;object-position:center var(--banner-position,45%);-webkit-user-drag:none;user-select:none}.portfolio-banner:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(to bottom,transparent,#fff);pointer-events:none}
+                .portfolio-page h1,.portfolio-page h2{color:var(--p-accent)}.portfolio-page h1{font-size:2.2rem;margin:14px 0 5px}
+                .portfolio-photos{position:relative;display:flex;justify-content:center;align-items:center;gap:8px;min-height:120px}.portfolio-photos.align-left{justify-content:flex-start}.portfolio-photos.align-right{justify-content:flex-end}
+                .portfolio-photos img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid white;box-shadow:0 3px 12px #3333}
+                .portfolio-photos.carousel{display:block;width:min(390px,100%);min-height:0;aspect-ratio:3/1;margin:auto;overflow:hidden;touch-action:pan-y;user-select:none}.portfolio-photos.carousel img{position:absolute;top:0;width:33.3333%;height:100%;aspect-ratio:1;border:0;border-radius:50%;object-fit:cover;cursor:grab;-webkit-user-drag:none}.portfolio-photos.carousel .pfp-left{left:0;opacity:.5;transform:scale(.75)}.portfolio-photos.carousel .pfp-center{left:33.3333%;opacity:1;transform:scale(1);z-index:2}.portfolio-photos.carousel .pfp-right{left:66.6667%;opacity:.5;transform:scale(.75)}.portfolio-photos.carousel .pfp-incoming{display:none;left:0;pointer-events:none}.portfolio-photos.carousel .pfp-enter-from-left{left:0}.portfolio-photos.carousel .pfp-enter-from-right{left:66.6667%}.portfolio-photos.carousel.is-animating .pfp-incoming{display:block}
+                .portfolio-status{color:#8f6c77;margin:0 0 14px}
+                .portfolio-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:18px 0}.portfolio-stat{position:relative;padding:10px;border-radius:10px;background:var(--p-soft);font-weight:650;font-size:.92rem;cursor:default}
+                .portfolio-stat[data-hint]{cursor:help}.portfolio-stat[data-hint]:hover:after,.portfolio-stat[data-hint]:focus-visible:after{content:attr(data-hint);position:absolute;z-index:5;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);padding:6px 12px;border-radius:8px;background:#4a4a4a;color:white;font-size:.78rem;font-weight:400;white-space:nowrap;box-shadow:0 3px 10px #0002}
+                .portfolio-badges{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}.portfolio-badges img{width:32px;height:32px;object-fit:contain}
+                .portfolio-bio{padding:16px;border-left:4px solid var(--p-accent);border-radius:8px;background:#fffcfc;text-align:left;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+                .portfolio-socials{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}.portfolio-socials a,.portfolio-button{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:24px;background:var(--p-accent);color:#fff;text-decoration:none;font-weight:bold}
+                .portfolio-socials img{width:22px;height:22px;object-fit:contain}.portfolio-section{margin:0 auto 18px;padding:28px;border-radius:22px;background:#fff;box-shadow:0 10px 25px #32101a0c}
+                .portfolio-section h2{font-size:1.25rem;border-bottom:2px solid var(--p-soft);padding-bottom:8px}.portfolio-time{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:16px;padding:8px 12px;border:1px solid var(--p-soft);border-radius:20px;background:#fffcfc}.portfolio-time-info{text-align:left}.portfolio-time-info h3{margin:0;color:var(--p-accent);font-size:1.2rem}.portfolio-time-zone{color:#9c7783;font-size:.8rem}
+                .hybrid-clock{position:relative;flex:0 0 70px;width:70px;height:70px;border:2px solid var(--p-soft);border-radius:50%;background:#fff;box-shadow:0 4px 10px color-mix(in srgb,var(--p-accent) 9%,transparent)}.hybrid-hand{position:absolute;top:50%;height:2px;border-radius:2px;transform-origin:100%}.h-hour{left:25%;width:25%;height:3px;background:var(--p-ink)}.h-min{left:15%;width:35%;background:#888}.h-sec{left:12%;width:38%;height:1px;background:var(--p-accent)}.hybrid-digital{position:absolute;z-index:3;top:40%;left:50%;transform:translateX(-50%);padding:2px 4px;border-radius:4px;background:#fffdfddd;color:var(--p-ink);font:bold .75rem monospace}
+                .portfolio-interest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px}.portfolio-interest{min-height:190px;display:flex;flex-direction:column;justify-content:end;padding:12px;color:#fff;border-radius:12px;background:linear-gradient(160deg,var(--p-soft),var(--p-accent));background-position:center;background-size:cover;text-shadow:0 1px 5px #000b}
+                .portfolio-interest small{margin-top:4px}.portfolio-extra{line-height:1.6;overflow-wrap:anywhere}.portfolio-extra img{display:block;max-width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin:12px auto}
+                @media(max-width:520px){body{padding:12px}.portfolio-card{--card-padding:22px;padding:var(--card-padding)}.portfolio-section{padding:22px}.portfolio-banner{height:auto;aspect-ratio:2.3/1}.portfolio-stats{grid-template-columns:1fr}}
+            `;
+            const LEGACY_PORTFOLIO_CSS = `
+                *{box-sizing:border-box}body{margin:0;padding:24px;background:#fffafa;color:#4a4a4a;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+                .portfolio-page{--p-accent:#ff85a2;--p-soft:#ffe4e9;max-width:740px;margin:auto}
+                .portfolio-card{margin:0 auto 18px;padding:32px;border-radius:26px;background:#fff;text-align:center;box-shadow:0 12px 30px color-mix(in srgb,var(--p-accent) 15%,transparent)}
+                .portfolio-page h1,.portfolio-page h2{color:var(--p-accent)}.portfolio-page h1{font-size:2.2rem;margin:14px 0 5px}
+                .portfolio-photos{display:flex;justify-content:center;align-items:center;gap:8px;min-height:120px}.portfolio-photos.align-left{justify-content:flex-start}.portfolio-photos.align-right{justify-content:flex-end}
+                .portfolio-photos img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid white;box-shadow:0 3px 12px #3333}
+                .portfolio-photos.carousel{overflow-x:auto;scroll-snap-type:x mandatory}.portfolio-photos.carousel img{flex:0 0 78px;width:78px;height:78px;scroll-snap-align:center}.portfolio-status{color:#8f6c77;margin:0 0 14px}
+                .portfolio-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:18px 0}.portfolio-stat{position:relative;padding:10px;border-radius:10px;background:var(--p-soft);font-weight:650;font-size:.92rem}
+                .portfolio-badges{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}.portfolio-badges img{width:32px;height:32px;object-fit:contain}
+                .portfolio-bio{padding:16px;border-left:4px solid var(--p-accent);border-radius:8px;background:#fffcfc;text-align:left;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+                .portfolio-socials{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}.portfolio-socials a,.portfolio-button{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:24px;background:var(--p-accent);color:#fff;text-decoration:none;font-weight:bold}
+                .portfolio-socials img{width:22px;height:22px;object-fit:contain}.portfolio-section{margin:0 auto 18px;padding:28px;border-radius:22px;background:#fff;box-shadow:0 10px 25px #32101a0c}
+                .portfolio-section h2{font-size:1.25rem;border-bottom:2px solid var(--p-soft);padding-bottom:8px}.portfolio-time{padding:14px;border:1px solid var(--p-soft);border-radius:12px;background:#fffcfc}
+                .portfolio-interest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px}.portfolio-interest{min-height:190px;display:flex;flex-direction:column;justify-content:end;padding:12px;color:#fff;border-radius:12px;background:linear-gradient(160deg,var(--p-soft),var(--p-accent));background-position:center;background-size:cover;text-shadow:0 1px 5px #000b}
+                .portfolio-interest small{margin-top:4px}.portfolio-extra{line-height:1.6;overflow-wrap:anywhere}.portfolio-extra img{display:block;max-width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin:12px auto}
+                @media(max-width:520px){body{padding:12px}.portfolio-card,.portfolio-section{padding:22px}.portfolio-stats{grid-template-columns:1fr}}
+            `;
+
+            let mode = "new";
+            let stepIndex = 0;
+            let config = structuredClone(DEFAULTS);
+            let wizardFromEditor = false;
+            let token = "";
+            let account = "";
+            let repository = null;
+            let existingSha = null;
+            let managedPortfolio = false;
+            let saveInProgress = false;
+            const badgeData = new Map();
+            const $ = (selector) => document.querySelector(selector);
+            const welcomeView = $("#welcome-view");
+            const connectView = $("#connect-view");
+            const wizardView = $("#wizard-view");
+            const editorView = $("#editor-view");
+            const wizardContent = $("#wizard-content");
+            const preview = $("#portfolio-preview");
+            const editorPreview = $("#editor-preview");
+            const wizardPreviewFrame = $("#wizard-preview-frame");
+            const consentDialog = $("#consent-dialog");
+            const saveDialog = $("#save-dialog");
+            const containerDialog = $("#container-dialog");
+            let editedExtraIndex = null;
+
+            function escapeHtml(value) {
+                return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+                    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+                })[char]);
+            }
+
+            function cleanLink(value) {
+                try {
+                    const url = new URL(String(value || ""));
+                    return url.protocol === "https:" ? url.href : "";
+                } catch {
+                    return "";
+                }
+            }
+
+            function textWithEmoji(value) {
+                return escapeHtml(value).replace(/:([a-z0-9_+-]+):/gi, (match, name) =>
+                    Object.prototype.hasOwnProperty.call(EMOJIS, name.toLowerCase()) ? EMOJIS[name.toLowerCase()] : match
+                );
+            }
+
+            function dateLabel(iso) {
+                if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || "";
+                const date = new Date(`${iso}T00:00:00`);
+                return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+            }
+
+            function relativeDateHint(iso) {
+                if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
+                const date = new Date(`${iso}T00:00:00`);
+                if (Number.isNaN(date.getTime())) return "";
+                const today = new Date();
+                const days = Math.abs(Math.floor((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())) / 86400000));
+                if (days === 0) return "Today";
+                if (days >= 365) return `${Math.floor(days / 365.2425)} years`;
+                if (days >= 30) return `${Math.floor(days / 30.4375)} months`;
+                return `${days} days`;
+            }
+
+            function clampNumber(value, minimum, maximum, fallback) {
+                const number = Number(value);
+                return Number.isFinite(number) ? Math.max(minimum, Math.min(maximum, number)) : fallback;
+            }
+
+            function timezoneTime(zone) {
+                try {
+                    return new Intl.DateTimeFormat(undefined, { timeZone: zone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
+                } catch (error) {
+                    if (error instanceof RangeError) return null;
+                    throw error;
+                }
+            }
+
+            function dataUriFromBytes(bytes, mime) {
+                let binary = "";
+                for (let i = 0; i < bytes.length; i += 0x8000) {
+                    binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + 0x8000, bytes.length)));
+                }
+                return `data:${mime};base64,${btoa(binary)}`;
+            }
+
+            function utf8ToBase64(text) {
+                return dataUriFromBytes(new TextEncoder().encode(text), "text/plain").split(",")[1];
+            }
+
+            function base64ToUtf8(value) {
+                const binary = atob(value.replace(/\s/g, ""));
+                const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+                return new TextDecoder().decode(bytes);
+            }
+
+            async function fileToDataUri(file) {
+                if (!file || !file.type.startsWith("image/")) throw new Error("Choose an image file.");
+                if (file.size > 4 * 1024 * 1024) throw new Error("Each image must be smaller than 4 MB.");
+                let bitmap;
+                try {
+                    bitmap = await createImageBitmap(file);
+                } catch {
+                    throw new Error("This image could not be opened. Try a PNG, JPEG, or WebP image.");
+                }
+
+                try {
+                    const maxDimension = 1200;
+                    const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+                    const canvas = document.createElement("canvas");
+                    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+                    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+                    const context = canvas.getContext("2d");
+                    if (!context) throw new Error("Your browser could not prepare the image for publishing.");
+                    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+                    for (let attempt = 0; attempt < 8; attempt++) {
+                        const quality = [0.82, 0.72, 0.62, 0.52][attempt % 4];
+                        const blob = await new Promise((resolve, reject) => {
+                            canvas.toBlob(
+                                (result) => result ? resolve(result) : reject(new Error("Your browser could not compress this image.")),
+                                "image/webp",
+                                quality
+                            );
+                        });
+                        if (blob.type !== "image/webp") {
+                            throw new Error("This browser cannot compress images to WebP. Try a current version of Chrome, Edge, Firefox, or Safari.");
+                        }
+                        if (blob.size <= 90 * 1024) {
+                            return await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(String(reader.result));
+                                reader.onerror = () => reject(new Error("The compressed image could not be read."));
+                                reader.readAsDataURL(blob);
+                            });
+                        }
+
+                        if (attempt % 4 === 3) {
+                            canvas.width = Math.max(1, Math.round(canvas.width * 0.8));
+                            canvas.height = Math.max(1, Math.round(canvas.height * 0.8));
+                            context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+                        }
+                    }
+                    throw new Error("This image is too detailed to optimize for GitHub. Try a smaller or simpler image.");
+                } finally {
+                    bitmap.close();
+                }
+            }
+
+            function showStatus(element, message, kind = "") {
+                element.textContent = message;
+                element.className = `status${kind ? ` ${kind}` : ""}`;
+            }
+
+            async function loadBadgeAssets() {
+                if (window.location.protocol === "file:") {
+                    const warning = document.createElement("p");
+                    warning.className = "note";
+                    warning.textContent = "Badge previews need the editor served over HTTP or HTTPS. The badge gallery will be available when you open this page from your hosted site.";
+                    welcomeView.append(warning);
+                    return;
+                }
+                const results = await Promise.all(BADGES.map(async (badge) => {
+                    const response = await fetch(badge.path);
+                    if (!response.ok) throw new Error(`Could not load the badge gallery (${badge.path}). Open Portfolio Studio from its hosted site and reload.`);
+                    const blob = await response.blob();
+                    const data = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(String(reader.result));
+                        reader.onerror = () => reject(new Error(`Could not read ${badge.path}.`));
+                        reader.readAsDataURL(blob);
+                    });
+                    return [badge.name, data];
+                }));
+                for (const [name, data] of results) badgeData.set(name, data);
+            }
+
+            function portfolioMarkup(data) {
+                const accent = /^#[0-9a-f]{6}$/i.test(data.accent) ? data.accent : DEFAULTS.accent;
+                const soft = `${accent}30`;
+                const images = (data.profile.images || []).filter((image) => typeof image.data === "string" && image.data.startsWith("data:image/"));
+                const shownImages = data.profile.type === "default" ? images.slice(0, 1) : images;
+                const pictureHtml = data.profile.type === "carousel" && shownImages.length > 1
+                    ? Array.from({ length: 4 }, (_, index) => shownImages[index % shownImages.length]).map((image, index) =>
+                        `<img class="pfp-${["left", "center", "right", "incoming"][index]}" data-pfp-index="${index}" src="${escapeHtml(image.data)}" alt="${escapeHtml(image.alt || "Profile picture")}" draggable="false">`
+                    ).join("")
+                    : shownImages.map((image) =>
+                        `<img src="${escapeHtml(image.data)}" alt="${escapeHtml(image.alt || "Profile picture")}">`
+                    ).join("");
+                const statsHtml = data.stats.map((stat) => {
+                    const label = textWithEmoji(stat.label);
+                    const value = stat.type === "date" ? dateLabel(stat.value) : stat.value;
+                    const content = `${label}: ${textWithEmoji(stat.prefix || "")}${textWithEmoji(value || "")}`;
+                    const dateAttr = stat.type === "date" && /^\d{4}-\d{2}-\d{2}$/.test(stat.value) ? ` data-date="${escapeHtml(stat.value)}" data-hint="${escapeHtml(relativeDateHint(stat.value))}" tabindex="0"` : "";
+                    return `<div class="portfolio-stat"${dateAttr}>${content}</div>`;
+                }).join("");
+                const badges = data.badges.map((name) => {
+                    const image = badgeData.get(name);
+                    return image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" title="${escapeHtml(name)}">` : "";
+                }).join("");
+                const socials = data.socials.map((social) => {
+                    const href = cleanLink(social.url);
+                    if (!href) return "";
+                    const iconUrl = cleanLink(social.iconUrl);
+                    const icon = social.iconData && social.iconData.startsWith("data:image/")
+                        ? `<img src="${escapeHtml(social.iconData)}" alt="">`
+                        : iconUrl
+                        ? `<img src="${escapeHtml(iconUrl)}" alt="">`
+                        : `<span aria-hidden="true">${escapeHtml((social.platform || "↗").slice(0, 1).toUpperCase())}</span>`;
+                    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(social.platform || "Social link")}">${icon}${textWithEmoji(social.label || social.platform || "Open link")}</a>`;
+                }).join("");
+                const timezone = data.timezone.enabled
+                    ? `<section class="portfolio-section" data-preview-part="timezone"><h2>My local time</h2><div class="portfolio-time"><div class="portfolio-time-info"><h3 data-timezone="${escapeHtml(data.timezone.zone)}">--:--</h3><span class="portfolio-time-zone">${escapeHtml(data.timezone.zone)}</span></div><div class="hybrid-clock" data-clock="${escapeHtml(data.timezone.zone)}" aria-label="Analogue clock"><span class="hybrid-hand h-hour"></span><span class="hybrid-hand h-min"></span><span class="hybrid-hand h-sec"></span><span class="hybrid-digital"></span></div></div></section>`
+                    : "";
+                const itemsByCategory = new Map();
+                for (const item of data.interests.items) {
+                    const category = String(item.category || "Interests").trim() || "Interests";
+                    if (!itemsByCategory.has(category)) itemsByCategory.set(category, []);
+                    itemsByCategory.get(category).push(item);
+                }
+                const categories = String(data.interests.categories || "").split(",").map((part) => part.trim()).filter(Boolean);
+                for (const category of categories) if (!itemsByCategory.has(category)) itemsByCategory.set(category, []);
+                const interestHtml = (data.interests.enabled || data.interests.items.length > 0) ? [...itemsByCategory.entries()].map(([category, items]) =>
+                    `<section class="portfolio-section" data-preview-part="interests"><h2>${textWithEmoji(category)}</h2><div class="portfolio-interest-grid">${items.map((item) =>
+                        `<article class="portfolio-interest"${item.image && item.image.startsWith("data:image/") ? ` style="background-image:linear-gradient(0deg,#0009,transparent),url('${escapeHtml(item.image)}');background-position:${clampNumber(item.positionX, 0, 100, 50)}% ${clampNumber(item.positionY, 0, 100, 50)}%"` : ""}><strong>${textWithEmoji(item.name || "Untitled interest")}</strong>${item.note ? `<small>${textWithEmoji(item.note)}</small>` : ""}</article>`
+                    ).join("")}</div></section>`
+                ).join("") : "";
+                const extras = data.extras.map((item) => {
+                    if (item.type === "button") {
+                        const href = cleanLink(item.url);
+                        return `<section class="portfolio-section portfolio-extra" data-preview-part="extras">${item.text ? `<h2>${textWithEmoji(item.text)}</h2>` : ""}${href ? `<a class="portfolio-button" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${textWithEmoji(item.label || "Open link")} ↗</a>` : ""}</section>`;
+                    }
+                    if (item.type === "image") {
+                        const image = item.image && item.image.startsWith("data:image/") ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.text || "Portfolio image")}" style="border-radius:${clampNumber(item.corners, 0, 40, 10)}px">` : "";
+                        return `<section class="portfolio-section portfolio-extra" data-preview-part="extras">${item.text ? `<h2>${textWithEmoji(item.text)}</h2>` : ""}${image}</section>`;
+                    }
+                    const align = ["left", "center", "right"].includes(item.alignment) ? item.alignment : "left";
+                    const size = clampNumber(item.size, 10, 48, 16);
+                    const font = ["inherit", "serif", "monospace", "Georgia", "Verdana"].includes(item.font) ? item.font : "inherit";
+                    return `<section class="portfolio-section portfolio-extra" data-preview-part="extras" style="text-align:${align};font-size:${size}px;font-family:${font}">${textWithEmoji(item.text || "")}</section>`;
+                }).join("");
+                const status = data.status ? `<p class="portfolio-status">${textWithEmoji(data.status)}</p>` : "";
+                const bio = data.bio ? `<div class="portfolio-bio">${textWithEmoji(data.bio)}</div>` : "";
+                const profileClass = data.profile.type === "carousel" && images.length > 1 ? "carousel" : "";
+                const alignment = ["left", "center", "right"].includes(data.profile.alignment) ? data.profile.alignment : "center";
+                const banner = data.profile.banner?.data?.startsWith("data:image/")
+                    ? `<div class="portfolio-banner" data-preview-part="profile" style="--banner-position:${clampNumber(data.profile.banner.positionY, 0, 100, 45)}%"><img src="${escapeHtml(data.profile.banner.data)}" alt="${escapeHtml(data.profile.banner.alt || "Profile banner")}"></div>`
+                    : "";
+                return `<div class="portfolio-page" style="--p-accent:${accent};--p-soft:${soft}"><main class="portfolio-card">${banner}<div class="portfolio-photos ${profileClass} align-${alignment}" data-preview-part="profile">${pictureHtml}</div><h1 data-preview-part="identity">${textWithEmoji(data.name || "Your name")}</h1>${status ? `<p class="portfolio-status" data-preview-part="identity">${textWithEmoji(data.status)}</p>` : ""}${statsHtml ? `<div class="portfolio-stats" data-preview-part="stats">${statsHtml}</div>` : ""}${badges ? `<div class="portfolio-badges" data-preview-part="badges" aria-label="Badges">${badges}</div>` : ""}${bio ? `<div class="portfolio-bio" data-preview-part="bio">${textWithEmoji(data.bio)}</div>` : ""}${socials ? `<nav class="portfolio-socials" data-preview-part="socials" aria-label="Social profiles">${socials}</nav>` : ""}</main>${timezone}${interestHtml}${extras}</div>`;
+            }
+
+            function initializePreviewBehavior(root) {
+                if (!root) return;
+                const photos = root.querySelector(".portfolio-photos.carousel");
+                if (!photos || photos.dataset.bound === "true") return;
+                const images = config.profile.images.filter((image) => image.data?.startsWith("data:image/"));
+                const slots = [...photos.querySelectorAll("img")];
+                if (images.length < 2 || slots.length < 4) return;
+                let current = 0;
+                let busy = false;
+                const assign = (node, index) => {
+                    const image = images[(index + images.length) % images.length];
+                    node.src = image.data;
+                    node.alt = image.alt || "Profile picture";
+                };
+                assign(slots[0], images.length - 1);
+                assign(slots[1], 0);
+                assign(slots[2], 1);
+                assign(slots[3], 2);
+                const rotate = (direction) => {
+                    if (busy || direction === 0) return;
+                    busy = true;
+                    const [left, center, right, incoming] = slots;
+                    assign(incoming, current + direction * 2);
+                    if (document.hidden || matchMedia("(prefers-reduced-motion: reduce)").matches || typeof left.animate !== "function") {
+                        current = (current + direction + images.length) % images.length;
+                        slots.splice(0, 4, ...(direction > 0 ? [center, right, incoming, left] : [incoming, left, center, right]));
+                        slots.forEach((node, index) => {
+                            node.className = `pfp-${["left", "center", "right", "incoming"][index]}`;
+                            node.removeAttribute("style");
+                        });
+                        assign(slots[0], current - 1);
+                        assign(slots[1], current);
+                        assign(slots[2], current + 1);
+                        assign(slots[3], current + 2);
+                        busy = false;
+                        return;
+                    }
+                    incoming.className = `pfp-incoming pfp-enter-from-${direction > 0 ? "right" : "left"}`;
+                    photos.classList.add("is-animating");
+                    const slotWidth = photos.clientWidth / 3;
+                    const shift = -direction * slotWidth;
+                    const outgoing = direction > 0 ? left : right;
+                    const movingSide = direction > 0 ? right : left;
+                    const animations = [
+                        outgoing.animate([{ opacity: .5 }, { opacity: 0 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                        center.animate([{ transform: "scale(1)", opacity: 1 }, { transform: `translateX(${shift}px) scale(.75)`, opacity: .5 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                        movingSide.animate([{ transform: "scale(.75)", opacity: .5 }, { transform: `translateX(${shift}px) scale(1)`, opacity: 1 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                        incoming.animate([{ transform: `translateX(${direction * slotWidth}px) scale(.75)`, opacity: 0 }, { transform: "scale(.75)", opacity: .5 }], { duration: 420, easing: "ease", fill: "forwards" })
+                    ];
+                    Promise.all(animations.map((animation) => animation.finished)).then(() => {
+                        current = (current + direction + images.length) % images.length;
+                        slots.splice(0, 4, ...(direction > 0 ? [center, right, incoming, left] : [incoming, left, center, right]));
+                        slots.forEach((node, index) => {
+                            node.className = `pfp-${["left", "center", "right", "incoming"][index]}`;
+                            node.removeAttribute("style");
+                        });
+                        assign(slots[3], current + 2);
+                        photos.classList.remove("is-animating");
+                        animations.forEach((animation) => animation.cancel());
+                        busy = false;
+                    }).catch(() => {
+                        animations.forEach((animation) => animation.cancel());
+                        photos.classList.remove("is-animating");
+                        slots.forEach((node, index) => {
+                            node.className = `pfp-${["left", "center", "right", "incoming"][index]}`;
+                            node.removeAttribute("style");
+                        });
+                        busy = false;
+                    });
+                };
+                let pointerStart = null;
+                photos.dataset.bound = "true";
+                photos.tabIndex = 0;
+                photos.addEventListener("wheel", (event) => {
+                    event.preventDefault();
+                    rotate(Math.sign(event.deltaY));
+                }, { passive: false });
+                photos.addEventListener("pointerdown", (event) => {
+                    if (event.pointerType === "touch" || event.pointerType === "pen") {
+                        pointerStart = event.clientX;
+                    }
+                });
+                photos.addEventListener("pointerup", (event) => {
+                    if (pointerStart === null) return;
+                    const delta = event.clientX - pointerStart;
+                    if (Math.abs(delta) > 24) rotate(delta < 0 ? 1 : -1);
+                    pointerStart = null;
+                });
+                photos.addEventListener("keydown", (event) => {
+                    if (event.key === "ArrowRight") rotate(1);
+                    if (event.key === "ArrowLeft") rotate(-1);
+                });
+            }
+
+            function updatePreviewClocks() {
+                document.querySelectorAll("#portfolio-preview [data-clock], #editor-preview [data-clock]").forEach((clock) => {
+                    const zone = clock.dataset.clock;
+                    const display = clock.closest(".portfolio-page")?.querySelector("[data-timezone]");
+                    try {
+                        const parts = new Intl.DateTimeFormat("en-GB", { timeZone: zone, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+                        const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+                        const hour = Number(values.hour), minute = Number(values.minute), second = Number(values.second);
+                        const hourText = String(values.hour).padStart(2, "0");
+                        if (display) display.textContent = `${hourText}:${values.minute}`;
+                        clock.querySelector(".hybrid-digital").textContent = `${hourText}:${values.minute}`;
+                        clock.querySelector(".h-hour").style.transform = `rotate(${hour % 12 * 30 + minute * .5 - 90}deg)`;
+                        clock.querySelector(".h-min").style.transform = `rotate(${minute * 6 - 90}deg)`;
+                        clock.querySelector(".h-sec").style.transform = `rotate(${second * 6 - 90}deg)`;
+                    } catch (error) {
+                        if (!(error instanceof RangeError)) throw error;
+                        if (display) display.textContent = "Invalid timezone";
+                    }
+                });
+            }
+
+            function generatedPortfolioRuntime() {
+                const root = document.querySelector(".portfolio-page");
+                if (!root) return;
+                const relativeDateHint = (iso) => {
+                    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return "";
+                    const date = new Date(`${iso}T00:00:00`);
+                    if (Number.isNaN(date.getTime())) return "";
+                    const today = new Date();
+                    const days = Math.abs(Math.floor((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())) / 86400000));
+                    if (days === 0) return "Today";
+                    if (days >= 365) return `${Math.floor(days / 365.2425)} years`;
+                    if (days >= 30) return `${Math.floor(days / 30.4375)} months`;
+                    return `${days} days`;
+                };
+                for (const node of root.querySelectorAll("[data-date]")) {
+                    node.dataset.hint = relativeDateHint(node.dataset.date);
+                }
+
+                const data = JSON.parse(document.getElementById("portfolio-studio-data").textContent);
+                const photos = root.querySelector(".portfolio-photos.carousel");
+                if (photos && data.profile.images.length > 1) {
+                    const images = data.profile.images.filter((image) => image.data?.startsWith("data:image/"));
+                    let slots = [...photos.querySelectorAll("img")];
+                    let current = 0;
+                    let animating = false;
+                    const roles = ["left", "center", "right", "incoming"];
+                    const assign = (node, index) => {
+                        const image = images[(index + images.length) % images.length];
+                        node.src = image.data;
+                        node.alt = image.alt || "Profile picture";
+                    };
+                    const restore = () => {
+                        slots.forEach((node, index) => {
+                            node.className = `pfp-${roles[index]}`;
+                            node.removeAttribute("style");
+                        });
+                        photos.classList.remove("is-animating");
+                        animating = false;
+                    };
+                    assign(slots[0], images.length - 1);
+                    assign(slots[1], 0);
+                    assign(slots[2], 1);
+                    assign(slots[3], 2);
+
+                    const rotate = (direction) => {
+                        if (animating || direction === 0) return;
+                        if (matchMedia("(prefers-reduced-motion: reduce)").matches || typeof slots[0].animate !== "function") {
+                            const [left, center, right, incoming] = slots;
+                            current = (current + direction + images.length) % images.length;
+                            slots = direction > 0 ? [center, right, incoming, left] : [incoming, left, center, right];
+                            restore();
+                            assign(slots[0], current - 1);
+                            assign(slots[1], current);
+                            assign(slots[2], current + 1);
+                            assign(slots[3], current + 2);
+                            return;
+                        }
+                        animating = true;
+                        const [left, center, right, incoming] = slots;
+                        const nextCenter = (current + direction + images.length) % images.length;
+                        assign(incoming, nextCenter + direction);
+                        incoming.className = `pfp-incoming pfp-enter-from-${direction > 0 ? "right" : "left"}`;
+                        photos.classList.add("is-animating");
+                        const shift = -direction * photos.clientWidth / 3;
+                        const outgoing = direction > 0 ? left : right;
+                        const movingSide = direction > 0 ? right : left;
+                        const animations = [
+                            outgoing.animate([{ opacity: .5 }, { opacity: 0 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                            center.animate([{ transform: "scale(1)", opacity: 1 }, { transform: `translateX(${shift}px) scale(.75)`, opacity: .5 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                            movingSide.animate([{ transform: "scale(.75)", opacity: .5 }, { transform: `translateX(${shift}px) scale(1)`, opacity: 1 }], { duration: 420, easing: "ease", fill: "forwards" }),
+                            incoming.animate([{ transform: `translateX(${-shift}px) scale(.75)`, opacity: 0 }, { transform: "scale(.75)", opacity: .5 }], { duration: 420, easing: "ease", fill: "forwards" })
+                        ];
+                        Promise.all(animations.map((animation) => animation.finished)).then(() => {
+                            current = nextCenter;
+                            slots = direction > 0 ? [center, right, incoming, left] : [incoming, left, center, right];
+                            restore();
+                            assign(slots[3], current + 2);
+                            animations.forEach((animation) => animation.cancel());
+                        }).catch((error) => {
+                            animations.forEach((animation) => animation.cancel());
+                            restore();
+                            console.error("Unable to animate the profile picture carousel.", error);
+                        });
+                    };
+                    let pointerStart = null;
+                    photos.tabIndex = 0;
+                    photos.addEventListener("wheel", (event) => {
+                        event.preventDefault();
+                        rotate(Math.sign(event.deltaY));
+                    }, { passive: false });
+                    photos.addEventListener("pointerdown", (event) => {
+                        if (event.pointerType === "touch" || event.pointerType === "pen") pointerStart = event.clientX;
+                    });
+                    photos.addEventListener("pointerup", (event) => {
+                        if (pointerStart === null) return;
+                        const delta = event.clientX - pointerStart;
+                        if (Math.abs(delta) > 24) rotate(delta < 0 ? 1 : -1);
+                        pointerStart = null;
+                    });
+                    photos.addEventListener("keydown", (event) => {
+                        if (event.key === "ArrowRight") rotate(1);
+                        if (event.key === "ArrowLeft") rotate(-1);
+                    });
+                }
+
+                for (const clock of root.querySelectorAll("[data-clock]")) {
+                    const zone = clock.dataset.clock;
+                    const digital = clock.querySelector(".hybrid-digital");
+                    const display = root.querySelector("[data-timezone]");
+                    const update = () => {
+                        try {
+                            const parts = new Intl.DateTimeFormat("en-GB", { timeZone: zone, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+                            const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+                            const hourText = String(values.hour).padStart(2, "0");
+                            const hour = Number(values.hour), minute = Number(values.minute), second = Number(values.second);
+                            if (display) display.textContent = `${hourText}:${values.minute}`;
+                            if (digital) digital.textContent = `${hourText}:${values.minute}`;
+                            clock.querySelector(".h-hour").style.transform = `rotate(${hour % 12 * 30 + minute * .5 - 90}deg)`;
+                            clock.querySelector(".h-min").style.transform = `rotate(${minute * 6 - 90}deg)`;
+                            clock.querySelector(".h-sec").style.transform = `rotate(${second * 6 - 90}deg)`;
+                        } catch (error) {
+                            if (!(error instanceof RangeError)) throw error;
+                            if (display) display.textContent = "Invalid timezone";
+                        }
+                    };
+                    update();
+                    setInterval(update, 1000);
+                }
+            }
+
+            function normalizeGeneratedPortfolio(html) {
+                const runtime = `(${generatedPortfolioRuntime.toString()})();`;
+                return html.replace(
+                    /(<script>\s*)[\s\S]*?(<\/script>\s*<\/body>)/,
+                    (_match, opening, closing) => `${opening}${runtime}\n${closing}`
+                );
+            }
+
+            function legacyPortfolioMarkup(data) {
+                const accent = /^#[0-9a-f]{6}$/i.test(data.accent) ? data.accent : DEFAULTS.accent;
+                const soft = `${accent}30`;
+                const images = (data.profile.images || []).filter((image) => typeof image.data === "string" && image.data.startsWith("data:image/"));
+                const shownImages = data.profile.type === "default" ? images.slice(0, 1) : images;
+                const pictures = shownImages.map((image) =>
+                    `<img src="${escapeHtml(image.data)}" alt="${escapeHtml(image.alt || "Profile picture")}"${data.profile.type === "default" ? "" : ` title="${escapeHtml(image.alt || "")}"`}>`
+                ).join("");
+                const stats = data.stats.map((stat) => {
+                    const value = stat.type === "date" ? dateLabel(stat.value) : stat.value;
+                    const date = stat.type === "date" && /^\d{4}-\d{2}-\d{2}$/.test(stat.value) ? ` data-date="${escapeHtml(stat.value)}"` : "";
+                    return `<div class="portfolio-stat"${date}>${textWithEmoji(stat.label)}: ${textWithEmoji(stat.prefix || "")}${textWithEmoji(value || "")}</div>`;
+                }).join("");
+                const badges = data.badges.map((name) => {
+                    const image = badgeData.get(name);
+                    return image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" title="${escapeHtml(name)}">` : "";
+                }).join("");
+                const socials = data.socials.map((social) => {
+                    const href = cleanLink(social.url);
+                    if (!href) return "";
+                    const iconUrl = cleanLink(social.iconUrl);
+                    const icon = social.iconData && social.iconData.startsWith("data:image/")
+                        ? `<img src="${escapeHtml(social.iconData)}" alt="">`
+                        : iconUrl ? `<img src="${escapeHtml(iconUrl)}" alt="">`
+                        : `<span aria-hidden="true">${escapeHtml((social.platform || "↗").slice(0, 1).toUpperCase())}</span>`;
+                    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(social.platform || "Social link")}">${icon}${textWithEmoji(social.label || social.platform || "Open link")}</a>`;
+                }).join("");
+                const timezone = data.timezone.enabled
+                    ? `<section class="portfolio-section"><h2>My local time</h2><div class="portfolio-time"><strong>${escapeHtml(data.timezone.zone)}</strong><div data-timezone="${escapeHtml(data.timezone.zone)}">--:--</div></div></section>`
+                    : "";
+                const itemsByCategory = new Map();
+                for (const item of data.interests.items) {
+                    const category = String(item.category || "Interests").trim() || "Interests";
+                    if (!itemsByCategory.has(category)) itemsByCategory.set(category, []);
+                    itemsByCategory.get(category).push(item);
+                }
+                const categories = String(data.interests.categories || "").split(",").map((part) => part.trim()).filter(Boolean);
+                for (const category of categories) if (!itemsByCategory.has(category)) itemsByCategory.set(category, []);
+                const interests = (data.interests.enabled || data.interests.items.length > 0) ? [...itemsByCategory.entries()].map(([category, items]) =>
+                    `<section class="portfolio-section"><h2>${textWithEmoji(category)}</h2><div class="portfolio-interest-grid">${items.map((item) =>
+                        `<article class="portfolio-interest"${item.image && item.image.startsWith("data:image/") ? ` style="background-image:linear-gradient(0deg,#0009,transparent),url('${escapeHtml(item.image)}');background-position:${clampNumber(item.positionX, 0, 100, 50)}% ${clampNumber(item.positionY, 0, 100, 50)}%"` : ""}><strong>${textWithEmoji(item.name || "Untitled interest")}</strong>${item.note ? `<small>${textWithEmoji(item.note)}</small>` : ""}</article>`
+                    ).join("")}</div></section>`
+                ).join("") : "";
+                const extras = data.extras.map((item) => {
+                    if (item.type === "button") {
+                        const href = cleanLink(item.url);
+                        return `<section class="portfolio-section portfolio-extra">${item.text ? `<h2>${textWithEmoji(item.text)}</h2>` : ""}${href ? `<a class="portfolio-button" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${textWithEmoji(item.label || "Open link")} ↗</a>` : ""}</section>`;
+                    }
+                    if (item.type === "image") {
+                        const image = item.image && item.image.startsWith("data:image/") ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.text || "Portfolio image")}" style="border-radius:${clampNumber(item.corners, 0, 40, 10)}px">` : "";
+                        return `<section class="portfolio-section portfolio-extra">${item.text ? `<h2>${textWithEmoji(item.text)}</h2>` : ""}${image}</section>`;
+                    }
+                    const alignment = ["left", "center", "right"].includes(item.alignment) ? item.alignment : "left";
+                    const size = clampNumber(item.size, 10, 48, 16);
+                    const font = ["inherit", "serif", "monospace", "Georgia", "Verdana"].includes(item.font) ? item.font : "inherit";
+                    return `<section class="portfolio-section portfolio-extra" style="text-align:${alignment};font-size:${size}px;font-family:${font}">${textWithEmoji(item.text || "")}</section>`;
+                }).join("");
+                const status = data.status ? `<p class="portfolio-status">${textWithEmoji(data.status)}</p>` : "";
+                const bio = data.bio ? `<div class="portfolio-bio">${textWithEmoji(data.bio)}</div>` : "";
+                const profileClass = data.profile.type === "carousel" ? "carousel" : "";
+                const alignment = ["left", "center", "right"].includes(data.profile.alignment) ? data.profile.alignment : "center";
+                return `<div class="portfolio-page" style="--p-accent:${accent};--p-soft:${soft}"><main class="portfolio-card"><div class="portfolio-photos ${profileClass} align-${alignment}">${pictures}</div><h1>${textWithEmoji(data.name || "Your name")}</h1>${status}${stats ? `<div class="portfolio-stats">${stats}</div>` : ""}${badges ? `<div class="portfolio-badges" aria-label="Badges">${badges}</div>` : ""}${bio}${socials ? `<nav class="portfolio-socials" aria-label="Social profiles">${socials}</nav>` : ""}</main>${timezone}${interests}${extras}</div>`;
+            }
+
+            function legacyGeneratedPortfolio(data) {
+                const json = JSON.stringify(data).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
+                return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="theme-color" content="${escapeHtml(data.accent)}">\n<title>${escapeHtml(data.name || "Personal portfolio")}</title>\n<meta name="portfolio-studio-format" content="1">\n<style>${LEGACY_PORTFOLIO_CSS}</style>\n</head>\n<body>\n<!-- portfolio-studio:managed:v1 -->\n${legacyPortfolioMarkup(data)}\n                                \x3cscript id="portfolio-studio-data" type="application/json">${json}<\/script>\n\x3cscript>\n                (()=>{const root=document.querySelector(".portfolio-page");if(!root)return;for(const node of root.querySelectorAll("[data-date]")){const date=new Date(node.dataset.date+"T00:00:00");const today=new Date();const days=Math.abs(Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())-Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))/86400000));node.title=days===0?"Today":days>=365?Math.floor(days/365.2425)+" years":days>=30?Math.floor(days/30.4375)+" months":days+" days";}for(const node of root.querySelectorAll("[data-timezone]")){const zone=node.dataset.timezone;const update=()=>{try{node.textContent=new Intl.DateTimeFormat(undefined,{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(new Date());}catch{node.textContent="Invalid timezone";}};update();setInterval(update,1000);}})();\n                <\/script>\n\x3c/body>\n\x3c/html>\n`;
+            }
+
+            function generatedPortfolio(data) {
+                const json = JSON.stringify(data).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
+                return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="theme-color" content="${escapeHtml(data.accent)}">\n<title>${escapeHtml(data.name || "Personal portfolio")}</title>\n<meta name="portfolio-studio-format" content="1">\n<style>${PORTFOLIO_CSS}</style>\n</head>\n<body>\n<!-- portfolio-studio:managed:v1 -->\n${portfolioMarkup(data)}\n                                \x3cscript id="portfolio-studio-data" type="application/json">${json}<\/script>\n\x3cscript>\n                                                (()=>{const root=document.querySelector(".portfolio-page");if(!root)return;for(const node of root.querySelectorAll("[data-date]")){const date=new Date(node.dataset.date+"T00:00:00");const today=new Date();const days=Math.abs(Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())-Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))/86400000));node.dataset.hint=days===0?"Today":days>=365?Math.floor(days/365.2425)+" years":days>=30?Math.floor(days/30.4375)+" months":days+" days";}const dataNode=document.getElementById("portfolio-studio-data");const data=dataNode?JSON.parse(dataNode.textContent):null;const photos=root.querySelector(".portfolio-photos.carousel");if(photos&&data&&data.profile.images.length>1){const images=data.profile.images.filter(image=>image.data&&image.data.startsWith("data:image/"));const slots=[...photos.querySelectorAll("img")];let current=0,busy=false;const assign=(node,index)=>{const image=images[(index+images.length)%images.length];node.src=image.data;node.alt=image.alt||"Profile picture";};assign(slots[0],images.length-1);assign(slots[1],0);assign(slots[2],1);assign(slots[3],2);const rotate=direction=>{if(busy)return;busy=true;const [left,center,right,incoming]=slots;assign(incoming,current+direction*2);photos.classList.add("is-animating");incoming.style.left=direction>0?"100%":"-33.333%";const shift=direction>0?"-100%":"100%";const animations=[[left,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:0}]],[center,[{transform:"translateX(0) scale(1)",opacity:1},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]],[right,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(1)",opacity:1}]],[incoming,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]]];Promise.all(animations.map(([node,keyframes])=>node.animate(keyframes,{duration:380,easing:"ease-in-out",fill:"forwards"}).finished)).then(()=>{current=(current+direction+images.length)%images.length;const next=direction>0?[center,right,incoming,left]:[incoming,left,center,right];slots.splice(0,4,...next);slots.forEach((node,index)=>{node.className="pfp-"+["left","center","right","incoming"][index];node.style.left="";node.style.transform="";node.style.opacity="";});assign(slots[3],current+2);photos.classList.remove("is-animating");busy=false;}).catch(()=>{photos.classList.remove("is-animating");busy=false;});};let startX=0;photos.addEventListener("wheel",event=>{event.preventDefault();rotate(event.deltaY>=0?1:-1);},{passive:false});photos.addEventListener("pointerdown",event=>{startX=event.clientX;photos.setPointerCapture(event.pointerId);});photos.addEventListener("pointerup",event=>{const distance=event.clientX-startX;if(Math.abs(distance)>24)rotate(distance<0?1:-1);});photos.addEventListener("keydown",event=>{if(event.key==="ArrowRight")rotate(1);if(event.key==="ArrowLeft")rotate(-1);});photos.tabIndex=0;}for(const clock of root.querySelectorAll("[data-clock]")){const zone=clock.dataset.clock;const digital=clock.querySelector(".hybrid-digital");const display=root.querySelector("[data-timezone]");const update=()=>{try{const parts=new Intl.DateTimeFormat("en-GB",{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const values=Object.fromEntries(parts.map(part=>[part.type,part.value]));const hour=Number(values.hour),minute=Number(values.minute),second=Number(values.second);if(display)display.textContent=hour+":"+values.minute+":"+values.second;if(digital)digital.textContent=hour+":"+values.minute;clock.querySelector(".h-hour").style.transform="rotate("+(hour%12*30+minute*.5-90)+"deg)";clock.querySelector(".h-min").style.transform="rotate("+(minute*6-90)+"deg)";clock.querySelector(".h-sec").style.transform="rotate("+(second*6-90)+"deg)";}catch{if(display)display.textContent="Invalid timezone";}};update();setInterval(update,1000);}})();\n                <\/script>\n\x3c/body>\n\x3c/html>\n`;
+            }
+
+            function renderPreview() {
+                preview.innerHTML = portfolioMarkup(config);
+                for (const date of preview.querySelectorAll("[data-date]")) {
+                    date.dataset.hint = relativeDateHint(date.dataset.date);
+                }
+                document.documentElement.style.setProperty("--accent", config.accent);
+                document.documentElement.style.setProperty("--accent-soft", `${config.accent}30`);
+                initializePreviewBehavior(preview.querySelector(".portfolio-page"));
+                if (!editorView.classList.contains("hidden")) {
+                    editorPreview.innerHTML = portfolioMarkup(config);
+                    for (const date of editorPreview.querySelectorAll("[data-date]")) date.dataset.hint = relativeDateHint(date.dataset.date);
+                    initializePreviewBehavior(editorPreview.querySelector(".portfolio-page"));
+                }
+                updatePreviewClocks();
+            }
+
+            function renderStepIndicator() {
+                $("#step-indicator").innerHTML = STEPS.map((step, index) =>
+                    `<button class="step-dot${index === stepIndex ? " active" : ""}${index < stepIndex ? " complete" : ""}" type="button" data-step-index="${index}" aria-current="${index === stepIndex ? "step" : "false"}">${index + 1}. ${escapeHtml(step.title)}</button>`
+                ).join("");
+                const focus = ["accent", "profile", "identity", "badges", "bio", "socials", "timezone", "interests", "extras"][stepIndex];
+                if (focus === "accent") delete wizardPreviewFrame.dataset.focus;
+                else wizardPreviewFrame.dataset.focus = focus;
+            }
+
+            function field(label, key, value, type = "text", placeholder = "", withEmoji = false) {
+                const inputType = type === "date" ? "date" : type;
+                return `<div class="field"><label>${escapeHtml(label)}</label><input type="${inputType}" data-field="${key}" value="${escapeHtml(value || "")}" placeholder="${escapeHtml(placeholder)}">${withEmoji ? emojiPicker(key) : ""}</div>`;
+            }
+
+            function emojiPicker(target) {
+                return `<div class="emoji-picker"><span class="small">Insert emoji shortcode:</span><div class="emoji-row">${Object.entries(EMOJIS).map(([name, emoji]) =>
+                    `<button type="button" data-emoji-target="${escapeHtml(target)}" data-emoji="${escapeHtml(name)}" title="Insert :${escapeHtml(name)}:">${emoji} :${escapeHtml(name)}:</button>`
+                ).join("")}</div></div>`;
+            }
+
+            function renderWizard() {
+                renderStepIndicator();
+                const step = STEPS[stepIndex];
+                let body = "";
+                if (step.id === "accent") {
+                    const accent = /^#[0-9a-f]{6}$/i.test(config.accent) ? config.accent : DEFAULTS.accent;
+                    body = `<div class="field"><label for="accent-input">Your favourite colour</label><div class="row"><input id="accent-input" type="color" data-field="accent" value="${accent}"><input aria-label="Accent colour hex value" data-field="accent" value="${accent}" pattern="#[0-9a-fA-F]{6}" maxlength="7"></div><span class="small">The preview's accents update immediately.</span></div>`;
+                } else if (step.id === "profile") {
+                    const banner = config.profile.banner;
+                    body = `<div class="field"><label for="profile-banner-upload">Profile banner (optional)</label><input id="profile-banner-upload" type="file" accept="image/*"><span class="small">A wide image displayed above and behind your profile pictures, like the example. Images are optimized and embedded in the portfolio.</span></div>
+                        ${banner.data ? `<div class="form-card"><div class="form-card-head"><strong>Banner preview</strong><button class="danger" type="button" data-action="remove-banner">Remove banner</button></div><img src="${escapeHtml(banner.data)}" alt="" style="display:block;width:100%;max-height:180px;object-fit:cover;object-position:center ${clampNumber(banner.positionY, 0, 100, 45)}%;border-radius:10px"><div class="field"><label>Image description</label><input data-field="profile.banner.alt" value="${escapeHtml(banner.alt || "")}" placeholder="Describe the banner for screen readers"></div><div class="field"><label>Vertical crop</label><input type="range" min="0" max="100" data-field="profile.banner.positionY" value="${clampNumber(banner.positionY, 0, 100, 45)}"></div></div>` : ""}
+                        <div class="field"><label for="profile-upload">Upload profile picture${config.profile.type === "carousel" ? "s" : ""}</label><input id="profile-upload" type="file" accept="image/*" multiple><span class="small">Up to 4 MB each. Uploaded pictures are embedded in your published HTML. Avoid images you do not have permission to publish.</span></div>
+                        <div class="field"><label>Display style</label><div class="row"><label><input type="radio" name="profile-type" value="carousel" data-field="profile.type"${config.profile.type === "carousel" ? " checked" : ""}> Carousel</label><label><input type="radio" name="profile-type" value="default" data-field="profile.type"${config.profile.type === "default" ? " checked" : ""}> Single picture</label></div></div>
+                        <div class="field"><label for="profile-align">Alignment</label><select id="profile-align" data-field="profile.alignment">${["left", "center", "right"].map((item) => `<option${config.profile.alignment === item ? " selected" : ""}>${item}</option>`).join("")}</select></div>
+                        <div class="card-list">${config.profile.images.map((image, index) => `<div class="form-card"><div class="form-card-head"><strong>Picture ${index + 1}</strong><button class="danger" type="button" data-action="remove-image" data-index="${index}">Remove</button></div><div class="field-row">${arrayInput("profile.images", index, "alt", "Accessible description", image.alt || "", "text", true)}<div class="field"><label>Preview</label><img src="${escapeHtml(image.data)}" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:50%"></div></div></div>`).join("")}</div>`;
+                } else if (step.id === "identity") {
+                    body = `${field("Display name", "name", config.name, "text", "Your name", true)}${field("Short status (optional)", "status", config.status, "text", "A short line under your name", true)}
+                        <div class="row" style="justify-content:space-between"><h3>Your stat bars</h3><button type="button" data-action="add-stat">+ Add stat</button></div>
+                        <p class="small">A date stat can show a relative age/distance on hover. Prefix is optional text before its value. Leave anything blank to omit it.</p>
+                        <div class="card-list">${config.stats.map((stat, index) => `<div class="form-card"><div class="form-card-head"><strong>Stat ${index + 1}</strong><button class="danger" type="button" data-action="remove-stat" data-index="${index}">Remove</button></div>
+                            <div class="field-row">${arrayInput("stats", index, "label", "Label", stat.label, "text", true)}<div class="field"><label>Value type</label><select data-array="stats" data-index="${index}" data-key="type"><option value="text"${stat.type === "text" ? " selected" : ""}>Static text</option><option value="date"${stat.type === "date" ? " selected" : ""}>Date</option></select></div></div>
+                            ${arrayInput("stats", index, "value", stat.type === "date" ? "Date" : "Value", stat.value, stat.type === "date" ? "date" : "text", stat.type !== "date")}
+                            ${stat.type === "date" ? arrayInput("stats", index, "prefix", "Prefix (optional)", stat.prefix || "", "text", true) : ""}
+                            ${emojiPicker(`stats.${index}.label`)}</div>`).join("")}</div>`;
+                } else if (step.id === "badges") {
+                    body = `<p>Select any badges you want to display. They are optional.</p><div class="card-list">${BADGES.map((badge) => `<label class="form-card inline-check"><input type="checkbox" data-badge="${escapeHtml(badge.name)}"${config.badges.includes(badge.name) ? " checked" : ""}><span><img src="${escapeHtml(badgeData.get(badge.name) || "")}" alt="" style="width:25px;height:25px;object-fit:contain;vertical-align:middle;margin-right:8px">${escapeHtml(badge.name)}</span></label>`).join("")}</div>`;
+                } else if (step.id === "bio") {
+                    body = `<div class="field"><label for="bio-input">Your bio</label><textarea id="bio-input" data-field="bio" maxlength="1600" placeholder="A short introduction, your hobbies, or anything else you'd like to share.">${escapeHtml(config.bio)}</textarea><span class="small">Line breaks are preserved. For safety, bio content is plain text; links can be added in Social links.</span>${emojiPicker("bio")}</div>`;
+                } else if (step.id === "socials") {
+                    body = `<div class="row" style="justify-content:space-between"><p class="small">Social profiles are optional. Links must start with https://.</p><button type="button" data-action="add-social">+ Add link</button></div><div class="card-list">${config.socials.map((social, index) => `<div class="form-card"><div class="form-card-head"><strong>Social link ${index + 1}</strong><button class="danger" type="button" data-action="remove-social" data-index="${index}">Remove</button></div><div class="field-row">${arrayInput("socials", index, "platform", "Platform", social.platform || "", "text", true)}${arrayInput("socials", index, "label", "Link label", social.label || "", "text", true)}</div>${arrayInput("socials", index, "url", "Profile URL (https://)", social.url || "", "url")}${arrayInput("socials", index, "iconUrl", "Custom icon URL (optional, https://)", social.iconUrl || "", "url")}<div class="field"><label>Or upload a custom icon</label><input type="file" accept="image/*" data-social-icon="${index}">${social.iconData ? `<img src="${escapeHtml(social.iconData)}" alt="Custom icon preview" style="width:28px;height:28px;object-fit:contain">` : ""}</div></div>`).join("")}</div>`;
+                } else if (step.id === "timezone") {
+                    const current = timezoneTime(config.timezone.zone || "UTC") || "Invalid timezone";
+                    const confirmedTime = /^\d{2}:\d{2}$/.test(config.timezone.confirmedTime) ? config.timezone.confirmedTime : "";
+                    body = `<label class="inline-check"><input type="checkbox" data-field="timezone.enabled"${config.timezone.enabled ? " checked" : ""}><span>Show a timezone and live local clock</span></label>
+                        ${config.timezone.enabled ? `<div class="field">${field("IANA timezone (for example Europe/Amsterdam)", "timezone.zone", config.timezone.zone)}<span class="small">Current time calculated here: <strong>${escapeHtml(current)}</strong></span></div><div class="field"><label for="time-confirm">Enter the current time where you are</label><input id="time-confirm" type="time" data-field="timezone.confirmedTime" value="${confirmedTime}"><span class="small">This check helps catch an incorrect timezone before publishing.</span></div>` : `<p class="small">Skip this step if you do not want a clock on your page.</p>`}`;
+                } else if (step.id === "interests") {
+                    body = `<label class="inline-check"><input type="checkbox" data-field="interests.enabled"${config.interests.items.length || config.interests.enabled ? " checked" : ""}><span>Show an interests section (optional)</span></label>
+                        ${config.interests.enabled ? `<div class="field"><label>Categories (comma-separated, in display order)</label><input data-field="interests.categories" value="${escapeHtml(config.interests.categories)}">${emojiPicker("interests.categories")}<span class="small">Examples: Games I own, Hobbies I like, Communities I'm in.</span></div>
+                        <div class="row" style="justify-content:space-between"><h3>Vertical interest cards</h3><button type="button" data-action="add-interest">+ Add card</button></div>
+                        <div class="card-list">${config.interests.items.map((item, index) => `<div class="form-card"><div class="form-card-head"><strong>Interest ${index + 1}</strong><div class="tiny-actions"><button type="button" data-action="move-interest" data-index="${index}" data-direction="-1" aria-label="Move up">↑</button><button type="button" data-action="move-interest" data-index="${index}" data-direction="1" aria-label="Move down">↓</button><button class="danger" type="button" data-action="remove-interest" data-index="${index}">Remove</button></div></div><div class="field-row">${arrayInput("interests.items", index, "name", "Title", item.name || "", "text", true)}${arrayInput("interests.items", index, "category", "Category", item.category || "", "text", true)}</div>${arrayInput("interests.items", index, "note", "Short text (optional)", item.note || "", "text", true)}<div class="field"><label>Vertical banner background</label><input type="file" accept="image/*" data-interest-image="${index}"><span class="small">${item.image ? "Image selected. Choose another to replace it." : "Choose an image to crop into a vertical banner card."}</span>${item.image ? `<img src="${escapeHtml(item.image)}" alt="Banner preview" style="width:62px;height:90px;object-fit:cover;border-radius:8px">` : ""}</div><div class="field-row"><div class="field"><label>Horizontal crop</label><input type="range" min="0" max="100" data-array="interests.items" data-index="${index}" data-key="positionX" value="${escapeHtml(item.positionX ?? 50)}"></div><div class="field"><label>Vertical crop</label><input type="range" min="0" max="100" data-array="interests.items" data-index="${index}" data-key="positionY" value="${escapeHtml(item.positionY ?? 50)}"></div></div></div>`).join("")}</div>` : ""}`;
+                } else if (step.id === "extras") {
+                    body = `<p class="small">Add optional standalone containers. You can reorder them. Buttons open safe HTTPS links in a new tab; image corners are adjustable.</p>
+                        <div class="row"><button type="button" data-action="add-extra" data-type="text">+ Text container</button><button type="button" data-action="add-extra" data-type="button">+ Link button</button><button type="button" data-action="add-extra" data-type="image">+ Image</button></div>
+                        <div class="card-list" style="margin-top:14px">${config.extras.map((item, index) => `<div class="form-card"><div class="form-card-head"><strong>${escapeHtml(item.type)} container ${index + 1}</strong><div class="tiny-actions"><button type="button" data-action="move-extra" data-index="${index}" data-direction="-1" aria-label="Move up">↑</button><button type="button" data-action="move-extra" data-index="${index}" data-direction="1" aria-label="Move down">↓</button><button class="danger" type="button" data-action="remove-extra" data-index="${index}">Remove</button></div></div>
+                        ${item.type === "button" ? `${arrayInput("extras", index, "text", "Container heading (optional)", item.text || "", "text", true)}${arrayInput("extras", index, "label", "Button label", item.label || "", "text", true)}${arrayInput("extras", index, "url", "URL (https://)", item.url || "", "url")}` : item.type === "image" ? `${arrayInput("extras", index, "text", "Image description / heading", item.text || "", "text", true)}<div class="field"><label>Choose image</label><input type="file" accept="image/*" data-extra-image="${index}"><span class="small">${item.image ? "Image selected." : "Up to 4 MB."}</span></div>${arrayInput("extras", index, "corners", "Corner roundness (0-40 px)", item.corners || 10, "number")}` : `${arrayInput("extras", index, "text", "Container text", item.text || "", "text", true)}<div class="field-row"><div class="field"><label>Alignment</label><select data-array="extras" data-index="${index}" data-key="alignment">${["left", "center", "right"].map((v) => `<option${item.alignment === v ? " selected" : ""}>${v}</option>`).join("")}</select></div>${arrayInput("extras", index, "size", "Font size (10-48 px)", item.size || 16, "number")}<div class="field"><label>Font family</label><select data-array="extras" data-index="${index}" data-key="font">${["inherit", "serif", "monospace", "Georgia", "Verdana"].map((v) => `<option${(item.font || "inherit") === v ? " selected" : ""}>${v}</option>`).join("")}</select></div></div>`}</div>`).join("")}</div>`;
+                }
+                wizardContent.innerHTML = `<div class="step-heading"><h1>${escapeHtml(step.title)}</h1><p>${escapeHtml(step.description)}</p></div><div class="wizard-question">${body}</div><div class="wizard-actions"><button class="secondary" type="button" data-action="previous"${stepIndex === 0 ? " disabled" : ""}>Back</button><div class="right"><button class="secondary" type="button" data-action="skip"${["timezone", "interests", "socials", "extras"].includes(step.id) ? "" : " disabled"}>Skip</button><button type="button" data-action="next">${stepIndex === STEPS.length - 1 ? "Finish setup" : "Continue"}</button></div></div>`;
+                renderPreview();
+            }
+
+            function arrayInput(array, index, key, label, value, type = "text", withEmoji = false) {
+                return `<div class="field"><label>${escapeHtml(label)}</label><input type="${type}" data-array="${array}" data-index="${index}" data-key="${key}" value="${escapeHtml(value ?? "")}">${withEmoji ? emojiPicker(`${array}.${index}.${key}`) : ""}</div>`;
+            }
+
+            function setPath(object, path, value) {
+                const parts = path.split(".");
+                let current = object;
+                for (const part of parts.slice(0, -1)) current = current[part];
+                current[parts[parts.length - 1]] = value;
+            }
+
+            function updateField(target) {
+                const value = target.type === "checkbox" ? target.checked : target.value;
+                if (target.dataset.field) {
+                    if (target.dataset.field === "interests.enabled") {
+                        config.interests.enabled = target.checked;
+                        if (!target.checked) config.interests.items = [];
+                        renderWizard();
+                        return;
+                    }
+                    setPath(config, target.dataset.field, value);
+                    if (target.dataset.field === "timezone.enabled") {
+                        renderWizard();
+                        return;
+                    }
+                    if (target.dataset.field === "profile.type" && value === "default" && config.profile.images.length > 1) {
+                        config.profile.images = config.profile.images.slice(0, 1);
+                        renderWizard();
+                        return;
+                    }
+                } else if (target.dataset.array) {
+                    const array = target.dataset.array === "interests.items" ? config.interests.items : config[target.dataset.array];
+                    array[Number(target.dataset.index)][target.dataset.key] = value;
+                    if (target.dataset.key === "type" && target.dataset.array === "stats") {
+                        const stat = config.stats[Number(target.dataset.index)];
+                        if (stat.type === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(stat.value)) stat.value = "";
+                        renderWizard();
+                        return;
+                    }
+                }
+                renderPreview();
+            }
+
+            function insertEmoji(targetPath, name) {
+                const alias = `:${name}:`;
+                let input;
+                if (targetPath.startsWith("container.")) input = $("#container-form").elements[targetPath.split(".")[1]];
+                else if (targetPath === "bio") input = wizardContent.querySelector("#bio-input");
+                else if (targetPath.includes(".")) {
+                    const parts = targetPath.split(".");
+                    if (parts[0] === "interests") input = wizardContent.querySelector(`[data-array="interests.items"][data-index="${parts[2]}"][data-key="${parts[3]}"]`);
+                    else if (parts[0] === "profile" && parts[1] === "images") input = wizardContent.querySelector(`[data-array="profile.images"][data-index="${parts[2]}"][data-key="${parts[3]}"]`);
+                    else if (/^\d+$/.test(parts[1])) input = wizardContent.querySelector(`[data-array="${parts[0]}"][data-index="${parts[1]}"][data-key="${parts[2]}"]`);
+                    else input = wizardContent.querySelector(`[data-field="${targetPath}"]`);
+                } else input = wizardContent.querySelector(`[data-field="${targetPath}"]`);
+                if (input) {
+                    const start = input.selectionStart ?? input.value.length;
+                    const end = input.selectionEnd ?? input.value.length;
+                    input.value = `${input.value.slice(0, start)}${alias}${input.value.slice(end)}`;
+                    input.setSelectionRange(start + alias.length, start + alias.length);
+                    input.focus();
+                    input.dispatchEvent(new Event("input", { bubbles: true }));
+                    return;
+                }
+                if (targetPath === "bio") config.bio += alias;
+                else if (targetPath.startsWith("stats.")) {
+                    const [, index, key] = targetPath.split(".");
+                    config.stats[Number(index)][key] += alias;
+                } else if (targetPath.startsWith("extras.")) {
+                    const [, index, key] = targetPath.split(".");
+                    config.extras[Number(index)][key] += alias;
+                }
+                renderWizard();
+            }
+
+            function swapItems(items, index, direction) {
+                const other = index + direction;
+                if (other < 0 || other >= items.length) return;
+                [items[index], items[other]] = [items[other], items[index]];
+            }
+
+            function renderEditor() {
+                $("#editor-repository").textContent = repository ? `${account}/${repository.name}` : "Not connected";
+                const rows = [
+                    `<div class="editor-item"><span class="drag-handle" aria-hidden="true">▦</span><span class="item-name"><strong>Main profile</strong><br><span class="small">Name, photos, stats, badges, bio, and social links</span></span><button class="secondary" type="button" data-editor-action="profile">Edit details</button></div>`
+                ];
+                if (config.timezone.enabled) rows.push(`<div class="editor-item"><span class="drag-handle">▦</span><span class="item-name"><strong>Local time</strong><br><span class="small">${escapeHtml(config.timezone.zone)}</span></span><button class="secondary" type="button" data-editor-step="timezone">Edit</button></div>`);
+                if (config.interests.enabled || config.interests.items.length) rows.push(`<div class="editor-item"><span class="drag-handle">▦</span><span class="item-name"><strong>Interests</strong><br><span class="small">${config.interests.items.length} card(s)</span></span><button class="secondary" type="button" data-editor-step="interests">Edit</button></div>`);
+                config.extras.forEach((item, index) => {
+                    const title = item.text || item.label || (item.type === "image" ? "Image container" : "Untitled text container");
+                    rows.push(`<div class="editor-item" draggable="true" data-extra-index="${index}"><span class="drag-handle" aria-hidden="true">⠿</span><span class="item-name"><strong>${escapeHtml(title)}</strong><br><span class="small">${escapeHtml(item.type)} container</span></span><button class="secondary" type="button" data-editor-action="edit-extra" data-index="${index}">Edit</button><button class="danger" type="button" data-editor-action="remove-extra" data-index="${index}" aria-label="Remove ${escapeHtml(title)}">×</button></div>`);
+                });
+                if (!rows.length) $("#editor-items").innerHTML = `<div class="editor-empty">No containers yet.</div>`;
+                else $("#editor-items").innerHTML = rows.join("");
+                editorPreview.innerHTML = portfolioMarkup(config);
+                for (const date of editorPreview.querySelectorAll("[data-date]")) date.dataset.hint = relativeDateHint(date.dataset.date);
+                initializePreviewBehavior(editorPreview.querySelector(".portfolio-page"));
+                updatePreviewClocks();
+            }
+
+            function openExtraDialog(index = null, type = "text") {
+                editedExtraIndex = index;
+                const item = index === null
+                    ? (type === "button" ? { type, text: "", label: "Open link", url: "" } : type === "image" ? { type, text: "", image: "", corners: 10 } : { type: "text", text: "", alignment: "left", size: 16, font: "inherit" })
+                    : config.extras[index];
+                $("#container-dialog-title").textContent = index === null ? "Add container" : "Edit container";
+                const form = $("#container-form");
+                const input = (label, name, value, inputType = "text") => `<div class="field"><label>${escapeHtml(label)}</label><input name="${name}" type="${inputType}" value="${escapeHtml(value ?? "")}"></div>`;
+                if (item.type === "button") {
+                    form.innerHTML = `${input("Heading (optional)", "text", item.text)}${emojiPicker("container.text")}${input("Button label", "label", item.label)}${emojiPicker("container.label")}${input("Link (https://)", "url", item.url, "url")}`;
+                } else if (item.type === "image") {
+                    form.innerHTML = `${input("Image description or heading", "text", item.text)}${emojiPicker("container.text")}<div class="field"><label>Replace image</label><input name="imageFile" type="file" accept="image/*">${item.image ? `<img src="${escapeHtml(item.image)}" alt="Current image" style="max-width:180px;max-height:120px;border-radius:${clampNumber(item.corners, 0, 40, 10)}px">` : `<span class="small">Choose an image to display.</span>`}</div>${input("Corner roundness (0-40 px)", "corners", item.corners ?? 10, "number")}`;
+                } else {
+                    form.innerHTML = `${input("Container text", "text", item.text)}${emojiPicker("container.text")}<div class="field-row"><div class="field"><label>Alignment</label><select name="alignment">${["left", "center", "right"].map((value) => `<option value="${value}"${(item.alignment || "left") === value ? " selected" : ""}>${value}</option>`).join("")}</select></div>${input("Font size (10-48 px)", "size", item.size ?? 16, "number")}<div class="field"><label>Font family</label><select name="font">${["inherit", "serif", "monospace", "Georgia", "Verdana"].map((value) => `<option${(item.font || "inherit") === value ? " selected" : ""}>${value}</option>`).join("")}</select></div></div>`;
+                }
+                containerDialog.showModal();
+            }
+
+            async function saveExtraDialog() {
+                const form = $("#container-form");
+                const values = new FormData(form);
+                const target = editedExtraIndex === null
+                    ? (values.has("url") ? { type: "button" } : values.has("imageFile") ? { type: "image" } : { type: "text" })
+                    : config.extras[editedExtraIndex];
+                target.text = String(values.get("text") || "");
+                if (target.type === "button") {
+                    target.label = String(values.get("label") || "");
+                    target.url = String(values.get("url") || "");
+                } else if (target.type === "image") {
+                    target.corners = clampNumber(values.get("corners"), 0, 40, 10);
+                    const file = form.elements.imageFile.files[0];
+                    if (file) target.image = await fileToDataUri(file);
+                    if (editedExtraIndex === null && !target.image) throw new Error("Choose an image before adding this container.");
+                } else {
+                    target.alignment = String(values.get("alignment") || "left");
+                    target.size = clampNumber(values.get("size"), 10, 48, 16);
+                    target.font = String(values.get("font") || "inherit");
+                }
+                if (target.type === "button" && target.url && !cleanLink(target.url)) throw new Error("Link URLs must use https://.");
+                if (editedExtraIndex === null) config.extras.push(target);
+                containerDialog.close();
+                renderEditor();
+            }
+
+            function removeExtra(index) {
+                const item = config.extras[index];
+                if ((item.text || item.label || item.url || item.image) && !window.confirm("This container contains content. Remove it?")) return;
+                config.extras.splice(index, 1);
+                renderEditor();
+            }
+
+            function validateTimezoneConfirmation() {
+                if (!config.timezone.enabled) return true;
+                const now = timezoneTime(config.timezone.zone);
+                if (!now) {
+                    window.alert("Enter a valid IANA timezone, such as Europe/Amsterdam, or turn the optional clock off.");
+                    return false;
+                }
+                if (!config.timezone.confirmedTime) {
+                    window.alert("Enter the current time shown for this timezone, or turn the optional clock off.");
+                    return false;
+                }
+                if (config.timezone.confirmedTime !== now && !window.confirm(`The time you entered (${config.timezone.confirmedTime}) does not match the current time for ${config.timezone.zone} (${now}). Check the timezone and try again. Continue anyway?`)) {
+                    return false;
+                }
+                return true;
+            }
+
+            async function handleUpload(input) {
+                try {
+                    if (input.id === "profile-upload") {
+                        for (const file of Array.from(input.files || [])) {
+                            if (config.profile.type === "default" && config.profile.images.length) break;
+                            config.profile.images.push({ data: await fileToDataUri(file), alt: file.name.replace(/\.[^.]+$/, "") });
+                        }
+                    } else if (input.id === "profile-banner-upload" && input.files[0]) {
+                        config.profile.banner = {
+                            ...config.profile.banner,
+                            data: await fileToDataUri(input.files[0]),
+                            alt: input.files[0].name.replace(/\.[^.]+$/, ""),
+                            positionY: clampNumber(config.profile.banner.positionY, 0, 100, 45)
+                        };
+                    } else if (input.dataset.socialIcon !== undefined) {
+                        config.socials[Number(input.dataset.socialIcon)].iconData = await fileToDataUri(input.files[0]);
+                    } else if (input.dataset.interestImage !== undefined) {
+                        config.interests.items[Number(input.dataset.interestImage)].image = await fileToDataUri(input.files[0]);
+                    } else if (input.dataset.extraImage !== undefined) {
+                        config.extras[Number(input.dataset.extraImage)].image = await fileToDataUri(input.files[0]);
+                    }
+                    renderWizard();
+                } catch (error) {
+                    window.alert(error.message);
+                }
+            }
+
+            function handleAction(button) {
+                const index = Number(button.dataset.index);
+                const action = button.dataset.action;
+                if (action === "previous" && stepIndex > 0) stepIndex--;
+                if (action === "next") {
+                    if (STEPS[stepIndex].id === "timezone" && !validateTimezoneConfirmation()) return;
+                    if (stepIndex < STEPS.length - 1) stepIndex++;
+                    else {
+                        wizardFromEditor = false;
+                        showView("editor");
+                        return;
+                    }
+                }
+                if (action === "skip" && stepIndex < STEPS.length - 1) stepIndex++;
+                if (action === "add-stat") config.stats.push({ label: "", type: "text", value: "", prefix: "" });
+                if (action === "remove-stat") config.stats.splice(index, 1);
+                if (action === "add-social") config.socials.push({ platform: "", label: "", url: "", iconUrl: "" });
+                if (action === "remove-social") config.socials.splice(index, 1);
+                if (action === "add-interest") {
+                    config.interests.enabled = true;
+                    config.interests.items.push({ name: "", category: "", note: "", image: "" });
+                }
+                if (action === "remove-interest") {
+                    const item = config.interests.items[index];
+                    if ((item.name || item.note || item.image) && !window.confirm("This interest card contains content. Remove it?")) return;
+                    config.interests.items.splice(index, 1);
+                }
+                if (action === "move-interest") swapItems(config.interests.items, index, Number(button.dataset.direction));
+                if (action === "add-extra") {
+                    const type = button.dataset.type;
+                    config.extras.push(type === "button" ? { type, text: "", label: "Open link", url: "" } : type === "image" ? { type, text: "", image: "", corners: 10 } : { type: "text", text: "", alignment: "left", size: 16 });
+                }
+                if (action === "remove-extra") {
+                    const item = config.extras[index];
+                    if ((item.text || item.label || item.url || item.image) && !window.confirm("This container contains content. Remove it?")) return;
+                    config.extras.splice(index, 1);
+                }
+                if (action === "move-extra") swapItems(config.extras, index, Number(button.dataset.direction));
+                if (action === "remove-image") config.profile.images.splice(index, 1);
+                if (action === "remove-banner") config.profile.banner = { ...DEFAULTS.profile.banner };
+                if (action === "add-bio-break") config.bio += "\n";
+                renderWizard();
+            }
+
+            function showView(name) {
+                welcomeView.classList.toggle("hidden", name !== "welcome");
+                connectView.classList.toggle("hidden", name !== "connect");
+                wizardView.classList.toggle("hidden", name !== "wizard");
+                editorView.classList.toggle("hidden", name !== "editor");
+                if (name === "wizard") {
+                    $("#wizard-editor-button").classList.toggle("hidden", !wizardFromEditor);
+                    renderWizard();
+                    window.scrollTo(0, 0);
+                } else if (name === "editor") {
+                    renderEditor();
+                    window.scrollTo(0, 0);
+                }
+            }
+
+            function decodeContent(content) {
+                if (!content || content.encoding !== "base64") throw new Error("GitHub did not return a readable index.html file.");
+                return base64ToUtf8(content.content);
+            }
+
+            function parseManagedPortfolio(html) {
+                if (!html.includes("<!-- portfolio-studio:managed:v1 -->")) {
+                    throw new Error("This index.html was not created by Portfolio Studio. It may contain unsupported edits, so it was not changed.");
+                }
+                const match = html.match(/<script id="portfolio-studio-data" type="application\/json">([\s\S]*?)<\/script>/);
+                if (!match) throw new Error("The portfolio data is missing or damaged; the file may have been altered.");
+                let data;
+                try { data = JSON.parse(match[1]); }
+                catch { throw new Error("The portfolio data is invalid; the file may have been altered."); }
+                const normalized = structuredClone(DEFAULTS);
+                for (const key of Object.keys(normalized)) {
+                    if (Object.prototype.hasOwnProperty.call(data, key)) normalized[key] = data[key];
+                }
+                normalized.profile = { ...DEFAULTS.profile, ...(normalized.profile || {}) };
+                normalized.profile.banner = { ...DEFAULTS.profile.banner, ...(normalized.profile.banner || {}) };
+                normalized.timezone = { ...DEFAULTS.timezone, ...(normalized.timezone || {}) };
+                normalized.interests = { ...DEFAULTS.interests, ...(normalized.interests || {}) };
+                const legacyData = structuredClone(normalized);
+                if (!Object.prototype.hasOwnProperty.call(data.profile || {}, "banner")) delete legacyData.profile.banner;
+                if (normalizeGeneratedPortfolio(generatedPortfolio(normalized)) !== html && legacyGeneratedPortfolio(legacyData) !== html) {
+                    throw new Error("Unsupported changes were found in index.html. It may have been altered or corrupted, so editing was refused.");
+                }
+                return normalized;
+            }
+
+            async function githubRequest(path, options = {}) {
+                const response = await fetch(`https://api.github.com${path}`, {
+                    ...options,
+                    headers: {
+                        "Accept": "application/vnd.github+json",
+                        "Authorization": `Bearer ${token}`,
+                        "X-GitHub-Api-Version": "2022-11-28",
+                        ...(options.headers || {})
+                    }
+                });
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    const detail = body.message || `GitHub returned HTTP ${response.status}.`;
+                    const error = new Error(`${detail} Check that the Fine-grained token is valid and has the stated access to this repository.`);
+                    error.status = response.status;
+                    throw error;
+                }
+                return body;
+            }
+
+            async function connectToGitHub() {
+                const status = $("#connect-status");
+                const repoName = $("#repository").value.trim();
+                const suppliedToken = $("#pat").value.trim();
+                if (!/^[A-Za-z0-9_.-]+$/.test(repoName) || repoName === "." || repoName === "..") {
+                    showStatus(status, "Enter a valid repository name (not a URL).", "error");
+                    return;
+                }
+                if (!suppliedToken) {
+                    showStatus(status, "Enter your token to continue.", "error");
+                    return;
+                }
+                token = suppliedToken;
+                $("#connect-github").disabled = true;
+                showStatus(status, "Checking the token and selected repository with GitHub…");
+                try {
+                    const user = await githubRequest("/user");
+                    account = user.login;
+                    const repo = await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repoName)}`);
+                    if (repo.owner?.login?.toLowerCase() !== account.toLowerCase()) {
+                        throw new Error("The selected repository is not owned by the account verified by this token. Choose your own repository.");
+                    }
+                    if (!repo.permissions?.push && !repo.permissions?.admin) {
+                        throw new Error("This token does not appear to have write access to the selected repository.");
+                    }
+                    repository = repo;
+                    const filePath = `/repos/${encodeURIComponent(account)}/${encodeURIComponent(repoName)}/contents/index.html`;
+                    if (mode === "edit") {
+                        const file = await githubRequest(filePath);
+                        config = parseManagedPortfolio(decodeContent(file));
+                        existingSha = file.sha;
+                        managedPortfolio = true;
+                    } else {
+                        let contents;
+                        try {
+                            contents = await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repoName)}/contents`);
+                        } catch (error) {
+                            if (error.status !== 404 && !String(error.message).includes("Not Found")) throw error;
+                            contents = [];
+                        }
+                        if (!Array.isArray(contents) || contents.some((item) => item.type !== "file" || !/^readme(?:\.[^.]*)?$/i.test(item.name))) {
+                            throw new Error("For a new portfolio, this repository must be empty except for an optional README. No changes were made.");
+                        }
+                        existingSha = null;
+                        managedPortfolio = false;
+                        config = structuredClone(DEFAULTS);
+                    }
+                    $("#connect-intro").textContent = `Connected to ${account}/${repoName}. The token is only used in this page session.`;
+                    $("#connect-github").disabled = false;
+                    if (mode === "edit") showView("editor");
+                    else showView("wizard");
+                } catch (error) {
+                    token = "";
+                    $("#pat").value = "";
+                    showStatus(status, error.message, "error");
+                    $("#connect-github").disabled = false;
+                }
+            }
+
+            async function ensureNoConcurrentEdit() {
+                const path = `/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/contents/index.html`;
+                let sha = null;
+                try {
+                    const file = await githubRequest(path);
+                    if (!existingSha || file.sha !== existingSha) throw new Error("This repository changed since you opened it. Reload the portfolio before saving to avoid overwriting someone else's update.");
+                    sha = file.sha;
+                } catch (error) {
+                    if (existingSha || (error.status !== 404 && !String(error.message).includes("Not Found"))) throw error;
+                }
+                if (!managedPortfolio && !sha) {
+                    let contents;
+                    try {
+                        contents = await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/contents`);
+                    } catch (error) {
+                        if (error.status !== 404 && !String(error.message).includes("Not Found")) throw error;
+                        contents = [];
+                    }
+                    if (!Array.isArray(contents) || contents.some((item) => item.type !== "file" || !/^readme(?:\.[^.]*)?$/i.test(item.name))) {
+                        throw new Error("The repository is no longer empty (except for an optional README). No changes were made.");
+                    }
+                }
+                return sha;
+            }
+
+            async function enablePagesIfRequested() {
+                if (!$("#pages-permission").checked) return "";
+                try {
+                    await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/pages`);
+                    return " GitHub Pages is already enabled.";
+                } catch (error) {
+                    if (error.status !== 404 && !String(error.message).includes("Not Found")) throw error;
+                }
+                await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/pages`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ source: { branch: repository.default_branch || "main", path: "/" } })
+                });
+                return " GitHub Pages was enabled; it may take a few minutes to publish.";
+            }
+
+            async function savePortfolio() {
+                if (saveInProgress) return;
+                saveInProgress = true;
+                const confirm = $("#confirm-save");
+                confirm.disabled = true;
+                showStatus($("#save-status"), "Verifying the repository has not changed…");
+                try {
+                    if (!/^#[0-9a-f]{6}$/i.test(config.accent)) throw new Error("Choose a valid six-digit hex accent colour before publishing.");
+                    if (!config.name.trim()) throw new Error("Add a display name in the Identity step before publishing.");
+                    if (config.socials.some((social) => (social.url && !cleanLink(social.url)) || (social.iconUrl && !cleanLink(social.iconUrl)))) {
+                        throw new Error("Social profile and custom icon URLs must use https://.");
+                    }
+                    if (config.extras.some((item) => item.type === "button" && item.url && !cleanLink(item.url))) {
+                        throw new Error("Link button URLs must use https://.");
+                    }
+                    if (config.timezone.enabled && !timezoneTime(config.timezone.zone)) {
+                        throw new Error("Set a valid IANA timezone in the Timezone step before publishing.");
+                    }
+                    if (config.timezone.enabled && !config.timezone.confirmedTime) {
+                        throw new Error("Enter the current time for the selected timezone in the Timezone step before publishing.");
+                    }
+                    if (config.timezone.enabled && config.timezone.confirmedTime !== timezoneTime(config.timezone.zone) &&
+                        !window.confirm("The timezone time no longer matches the current time. Continue publishing anyway?")) {
+                        throw new Error("Publishing cancelled because the timezone time did not match.");
+                    }
+                    const sha = await ensureNoConcurrentEdit();
+                    const content = normalizeGeneratedPortfolio(generatedPortfolio(config));
+                    if (content.length > 900000) {
+                        const mediaChars = [
+                            ...config.profile.images.map((image) => image.data),
+                            config.profile.banner.data || "",
+                            ...config.socials.map((social) => social.iconData || ""),
+                            ...config.interests.items.map((item) => item.image || ""),
+                            ...config.extras.map((item) => item.image || "")
+                        ].reduce((total, image) => total + image.length, 0);
+                        throw new Error(`This portfolio is still too large for GitHub (${Math.ceil(content.length / 1024)} KB; limit 900 KB). Uploaded images are optimized automatically; remove some images or use fewer/smaller pictures. Images account for about ${Math.ceil(mediaChars / 1024)} KB.`);
+                    }
+                    const payload = {
+                        message: managedPortfolio ? "Update portfolio with Portfolio Studio" : "Create portfolio with Portfolio Studio",
+                        content: utf8ToBase64(content),
+                        ...(sha ? { sha } : {})
+                    };
+                    const saved = await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/contents/index.html`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    existingSha = saved.content.sha;
+                    managedPortfolio = true;
+                    let pagesNotice = "";
+                    try {
+                        pagesNotice = await enablePagesIfRequested();
+                    } catch (error) {
+                        showStatus($("#save-status"), `The portfolio was saved, but GitHub Pages setup failed: ${error.message} You can enable Pages manually in repository settings.`, "error");
+                        return;
+                    }
+                    showStatus($("#save-status"), `Portfolio saved to ${account}/${repository.name}/index.html.${pagesNotice} You can revoke the token now in GitHub PAT settings.`, "ok");
+                } catch (error) {
+                    showStatus($("#save-status"), `Could not complete publishing: ${error.message}`, "error");
+                } finally {
+                    saveInProgress = false;
+                    confirm.disabled = false;
+                }
+            }
+
+            document.querySelectorAll("[data-mode]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    mode = button.dataset.mode;
+                    $("#connect-intro").textContent = mode === "new"
+                        ? "Create a new portfolio in an empty repository on your own GitHub account."
+                        : "Choose the repository that contains a Portfolio Studio page. Unrecognized or altered HTML will be rejected rather than overwritten.";
+                    $("#repository").value = "";
+                    $("#pat").value = "";
+                    $("#terms-accept").checked = false;
+                    $("#accept-consent").disabled = true;
+                    consentDialog.showModal();
+                });
+            });
+            $("#terms-accept").addEventListener("change", (event) => { $("#accept-consent").disabled = !event.target.checked; });
+            $("#accept-consent").addEventListener("click", () => { consentDialog.close(); showView("connect"); });
+            $("#cancel-consent").addEventListener("click", () => consentDialog.close());
+            $("#back-home").addEventListener("click", () => showView("welcome"));
+            $("#connect-github").addEventListener("click", connectToGitHub);
+            $("#pat").addEventListener("keydown", (event) => { if (event.key === "Enter") connectToGitHub(); });
+            $("#step-indicator").addEventListener("click", (event) => {
+                const button = event.target.closest("[data-step-index]");
+                if (!button) return;
+                stepIndex = Number(button.dataset.stepIndex);
+                renderWizard();
+            });
+            $("#wizard-editor-button").addEventListener("click", () => showView("editor"));
+            $("#edit-details-button").addEventListener("click", () => {
+                wizardFromEditor = true;
+                stepIndex = 0;
+                showView("wizard");
+            });
+            $("#editor-add-text").addEventListener("click", () => openExtraDialog(null, "text"));
+            $("#editor-add-link").addEventListener("click", () => openExtraDialog(null, "button"));
+            $("#editor-add-image").addEventListener("click", () => openExtraDialog(null, "image"));
+            $("#cancel-container").addEventListener("click", () => containerDialog.close());
+            $("#save-container").addEventListener("click", () => {
+                saveExtraDialog().catch((error) => window.alert(error.message));
+            });
+            $("#container-form").addEventListener("click", (event) => {
+                const emoji = event.target.closest("[data-emoji]");
+                if (emoji) insertEmoji(emoji.dataset.emojiTarget, emoji.dataset.emoji);
+            });
+            $("#editor-items").addEventListener("click", (event) => {
+                const button = event.target.closest("[data-editor-action], [data-editor-step]");
+                if (!button) return;
+                if (button.dataset.editorAction === "profile") {
+                    wizardFromEditor = true;
+                    stepIndex = 0;
+                    showView("wizard");
+                } else if (button.dataset.editorStep) {
+                    wizardFromEditor = true;
+                    stepIndex = STEPS.findIndex((step) => step.id === button.dataset.editorStep);
+                    showView("wizard");
+                } else if (button.dataset.editorAction === "edit-extra") {
+                    openExtraDialog(Number(button.dataset.index));
+                } else if (button.dataset.editorAction === "remove-extra") {
+                    removeExtra(Number(button.dataset.index));
+                }
+            });
+            let draggedExtraIndex = null;
+            $("#editor-items").addEventListener("dragstart", (event) => {
+                const row = event.target.closest("[data-extra-index]");
+                if (!row) return;
+                draggedExtraIndex = Number(row.dataset.extraIndex);
+                row.classList.add("dragging");
+                event.dataTransfer.effectAllowed = "move";
+            });
+            $("#editor-items").addEventListener("dragover", (event) => {
+                const row = event.target.closest("[data-extra-index]");
+                if (!row || draggedExtraIndex === null) return;
+                event.preventDefault();
+                row.classList.add("drop-target");
+            });
+            $("#editor-items").addEventListener("dragleave", (event) => event.target.closest("[data-extra-index]")?.classList.remove("drop-target"));
+            $("#editor-items").addEventListener("drop", (event) => {
+                const row = event.target.closest("[data-extra-index]");
+                if (!row || draggedExtraIndex === null) return;
+                event.preventDefault();
+                const targetIndex = Number(row.dataset.extraIndex);
+                if (targetIndex !== draggedExtraIndex) {
+                    const [item] = config.extras.splice(draggedExtraIndex, 1);
+                    config.extras.splice(targetIndex, 0, item);
+                }
+                draggedExtraIndex = null;
+                renderEditor();
+            });
+            $("#editor-items").addEventListener("dragend", () => {
+                draggedExtraIndex = null;
+                $("#editor-items").querySelectorAll(".dragging, .drop-target").forEach((row) => row.classList.remove("dragging", "drop-target"));
+            });
+
+            wizardContent.addEventListener("input", (event) => {
+                if (event.target.matches("input[type=file]")) return;
+                updateField(event.target);
+            });
+            wizardContent.addEventListener("change", (event) => {
+                const target = event.target;
+                if (target.matches("input[type=file]")) { handleUpload(target); return; }
+                if (target.matches("[data-badge]")) {
+                    const name = target.dataset.badge;
+                    config.badges = target.checked ? [...new Set([...config.badges, name])] : config.badges.filter((badge) => badge !== name);
+                    renderPreview();
+                    return;
+                }
+                if (target.matches("[data-field], [data-array]")) updateField(target);
+            });
+            wizardContent.addEventListener("click", (event) => {
+                const emoji = event.target.closest("[data-emoji]");
+                if (emoji) { insertEmoji(emoji.dataset.emojiTarget, emoji.dataset.emoji); return; }
+                const action = event.target.closest("[data-action]");
+                if (action) handleAction(action);
+            });
+            const openSaveDialog = () => {
+                $("#save-status").textContent = "";
+                $("#confirm-save").disabled = false;
+                saveDialog.showModal();
+            };
+            $("#save-button").addEventListener("click", openSaveDialog);
+            $("#editor-save-button").addEventListener("click", openSaveDialog);
+            $("#cancel-save").addEventListener("click", () => saveDialog.close());
+            $("#confirm-save").addEventListener("click", savePortfolio);
+
+            window.setInterval(updatePreviewClocks, 1000);
+
+            window.addEventListener("pagehide", () => {
+                token = "";
+                $("#pat").value = "";
+            });
+
+            loadBadgeAssets().catch((error) => {
+                const warning = document.createElement("p");
+                warning.className = "warning";
+                warning.textContent = `${error.message} You can still build a portfolio without badges.`;
+                welcomeView.append(warning);
+            });
+        })();
+    </script>
+</body>
+</html>
