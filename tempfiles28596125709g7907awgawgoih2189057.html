@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="APvq1wGZ99gQOPp2ACDg5YjNtmMlE4rEqawT42eHuPU" />
+
+    <meta name="title" content="FlairDiva">
+    <meta name="description" content="A personal portfolio page for Flair Diva listing interests, creative work, and social profile links.">
+    <meta name="theme-color" content="#ff85a2">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://flairdiva.github.io/portifolio/">
+    <meta property="og:title" content="FlairDiva">
+    <meta property="og:description" content="This is my personal portfolio page. I share information about myself, my art, and my social profiles.">
+    <meta property="og:image" content="https://flairdiva.github.io/portifolio/Files/z236aQAAAAZJREFUAwDU1V2Df21tQAAAABJRU5ErkJggg.png">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://flairdiva.github.io/portifolio/">
+
+    <title>Flair Diva | Personal Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #fffafa;
+            --card-bg: #ffffff;
+            --accent-pink: #ff85a2;
+            --light-pink: #ffe4e9;
+            --text-main: #4a4a4a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        @media (min-width: 601px) and (pointer: fine) {
+            html {
+                scrollbar-color: var(--accent-pink) var(--light-pink);
+                scrollbar-width: thin;
+            }
+
+            html::-webkit-scrollbar {
+                width: 12px;
+            }
+
+            html::-webkit-scrollbar-track {
+                background: var(--light-pink);
+            }
+
+            html::-webkit-scrollbar-thumb {
+                background: var(--accent-pink);
+                border: 3px solid var(--light-pink);
+                border-radius: 10px;
+            }
+
+            html::-webkit-scrollbar-thumb:hover {
+                background: #f06f91;
+            }
+        }
+
+        @media (max-width: 600px), (pointer: coarse) {
+            html {
+                scrollbar-width: none;
+            }
+
+            html::-webkit-scrollbar {
+                display: none;
+                width: 0;
+                height: 0;
+            }
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 680px;
+            box-sizing: border-box;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 133, 162, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-container {
+            overflow: hidden;
+            padding: 0 40px 40px;
+        }
+
+        .profile-banner {
+            position: relative;
+            height: 230px;
+            margin: 0 -40px -75px;
+            overflow: hidden;
+        }
+
+        .profile-banner img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 45%;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .profile-banner::after {
+            content: "";
+            position: absolute;
+            inset: 45% 0 0;
+            background: linear-gradient(to bottom, transparent, var(--card-bg));
+            pointer-events: none;
+        }
+
+        .profile-section {
+            position: relative;
+            height: 150px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swipe-cue {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--accent-pink);
+            font-size: 0.85em;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(74, 74, 74, 0.18);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .swipe-cue i {
+            font-size: 1.25em;
+            transform: rotate(90deg);
+        }
+
+        .swipe-cue.is-visible {
+            animation: swipeCue 1.2s ease-in-out 0.5s both;
+        }
+
+        @keyframes swipeCue {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateX(18px);
+            }
+            16% {
+                opacity: 1;
+            }
+            58% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+            76% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        #pfp-popup {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            margin: 0;
+            font-size: 0.8em;
+            color: var(--accent-pink);
+            font-weight: bold;
+            background: rgba(255, 228, 233, 0.78);
+            border: 1px solid rgba(255, 133, 162, 0.28);
+            border-radius: 20px;
+            padding: 2px 10px;
+            width: max-content;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(255, 133, 162, 0.16);
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .pfp-container {
+            position: relative;
+            width: min(390px, 100%);
+            aspect-ratio: 3 / 1;
+            margin: 0 auto;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .pfp-container img {
+            position: absolute;
+            top: 0;
+            width: 33.333333%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+            z-index: 1;
+            -webkit-user-drag: none;
+        }
+
+        .pfp-left {
+            left: 0;
+            opacity: 0.5;
+            transform: scale(0.75);
+        }
+
+        .pfp-center {
+            left: 33.333333%;
+            opacity: 1;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        .pfp-right {
+            left: 66.666667%;
+            opacity: 0.5;
+            transform: scale(0.75);
+        }
+
+        .pfp-incoming {
+            display: none;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .pfp-enter-from-left {
+            left: 0;
+        }
+
+        .pfp-enter-from-right {
+            left: 66.666667%;
+        }
+
+        .pfp-container.is-animating .pfp-incoming {
+            display: block;
+        }
+
+        .pfp-hint {
+            font-size: 0.7em;
+            color: #d1a7b0;
+            margin-top: 5px;
+        }
+
+        h1 {
+            margin: 10px 0;
+            color: var(--accent-pink);
+            font-size: 2.2em;
+        }
+
+        .mic-status {
+            font-size: 1em;
+            color: #d1a7b0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-section {
+            margin: -10px 0 25px;
+            padding: 10px;
+            border: 1px solid rgba(255, 133, 162, 0.28);
+            border-radius: 12px;
+            background: rgba(255, 228, 233, 0.42);
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .badge-list img {
+            display: block;
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            margin: 2px;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .badge-item {
+            position: relative;
+            display: block;
+        }
+
+        .badge-item:hover::after {
+            content: attr(data-hint);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-main);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 10;
+            animation: fadeIn 0.2s ease;
+            pointer-events: none;
+        }
+
+        .badge-item:hover::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--text-main);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        inline-emoji {
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: -0.2em;
+            line-height: 1;
+        }
+
+        inline-emoji img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            background: var(--light-pink);
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            position: relative;
+            cursor: default;
+        }
+
+        .stat-item[data-hint]:hover::after {
+            content: attr(data-hint);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-main);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 10;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .stat-item[data-hint]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--text-main);
+            z-index: 10;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .bio {
+            line-height: 1.7;
+            margin: 25px 0;
+            background: #fffcfc;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-pink);
+            text-align: left;
+        }
+
+        .bio a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .social-links a {
+            color: var(--accent-pink);
+            font-size: 1.8em;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .social-links img.roblox-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-work {
+            background: var(--accent-pink);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 40px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-work:hover {
+            opacity: 0.9;
+        }
+
+        .section-title {
+            text-align: left;
+            border-bottom: 2px solid var(--light-pink);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: var(--accent-pink);
+            font-weight: bold;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 130px);
+            justify-content: start;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .game-card {
+            position: relative;
+            width: 100%;
+            max-width: 130px;
+            justify-self: center;
+            aspect-ratio: 2 / 3;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f0f0f0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .game-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            padding: 18px;
+            color: var(--text-main);
+            background: linear-gradient(180deg, #fffafa 0%, #ffe4e9 100%);
+        }
+
+        .disclaimer {
+            background: #fff6f8;
+            color: #6b2f45;
+            border: 1px solid #ffd4df;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 20px 0;
+            font-size: 0.95em;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        a {
+            color: var(--accent-pink);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Clock / Timezone Layout Styles */
+        .timezone-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 5px 10px;
+            background: #fffcfc;
+            border-radius: 20px;
+            border: 1px solid var(--light-pink);
+        }
+
+        .timezone-info {
+            text-align: left;
+        }
+
+        .timezone-info h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: var(--accent-pink);
+        }
+
+        .timezone-sub {
+            font-size: 0.8em;
+            color: #d1a7b0;
+        }
+
+        .hybrid-clock {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--light-pink);
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(255, 133, 162, 0.05);
+        }
+
+        .hybrid-hand {
+            position: absolute;
+            width: 50%;
+            top: 50%;
+            transform-origin: 100%;
+            height: 2px;
+            border-radius: 2px;
+        }
+
+        .h-hour {
+            width: 25%;
+            left: 25%;
+            background: var(--text-main);
+            height: 3px;
+        }
+
+        .h-min {
+            width: 35%;
+            left: 15%;
+            background: #8a8a8a;
+        }
+
+        .h-sec {
+            width: 38%;
+            left: 12%;
+            background: var(--accent-pink);
+            height: 1px;
+        }
+
+        .hybrid-digital {
+            position: absolute;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: var(--text-main);
+            z-index: 5;
+            background: rgba(255, 254, 254, 0.85);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .schedule-box h1 {
+            font-size: 1.6em;
+            margin: 15px 0 10px 0;
+            text-align: left;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 24px 12px;
+            }
+
+            .container {
+                padding: 28px 20px;
+                border-radius: 24px;
+            }
+
+            .profile-container {
+                padding: 0 20px 30px;
+            }
+
+            .profile-banner {
+                height: auto;
+                aspect-ratio: 2.3 / 1;
+                margin: 0 -20px -75px;
+            }
+
+            .profile-section {
+                height: 150px;
+            }
+
+            .timezone-row {
+                gap: 10px;
+                padding: 5px 8px;
+            }
+
+            .timezone-info h2 {
+                font-size: 1.15em;
+            }
+
+        }
+
+        @media (max-width: 600px) and (prefers-reduced-motion: no-preference) {
+            .swipe-cue.is-visible {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .stat-item {
+                min-width: 0;
+            }
+
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding-right: 16px;
+                padding-left: 16px;
+            }
+
+            .profile-container {
+                padding-right: 16px;
+                padding-left: 16px;
+            }
+
+            .profile-banner {
+                margin-right: -16px;
+                margin-left: -16px;
+            }
+
+            .timezone-row {
+                gap: 6px;
+            }
+
+            .hybrid-clock {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container profile-container">
+        <div class="profile-banner">
+            <img src="Files/Banner/Current/A.png" alt="A cozy attic room with windows overlooking trees" draggable="false">
+        </div>
+
+        <div class="profile-section">
+            <div class="pfp-container" id="pfp-container" role="group" aria-label="Profile pictures. Scroll or swipe to browse, or select a picture to view the biography.">
+                <img class="pfp-left" src="" alt="" draggable="false">
+                <img class="pfp-center" src="" alt="" draggable="false">
+                <img class="pfp-right" src="" alt="" draggable="false">
+                <img class="pfp-incoming" src="" alt="" aria-hidden="true" draggable="false">
+            </div>
+            <div class="swipe-cue" id="swipe-cue" aria-hidden="true">
+                <i class="fas fa-hand-pointer"></i>
+                <span>Swipe</span>
+            </div>
+            <div id="pfp-popup"></div>
+        </div>
+
+        <h1>Flair Diva</h1>
+
+        <div class="mic-status">
+            <i class="fas fa-microphone-slash"></i> <span>I don't like using my mic.</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">Pronouns: She/Her</div>
+            <div class="stat-item" id="birthdate-item" data-hint="">Birthdate: 4 August 2009</div>
+            <div class="stat-item">Gender: <inline-emoji src="Files/emojs/FemaleSighn.svg" alt="Female symbol"></inline-emoji> Female</div>
+            <div class="stat-item">Relationship status: Single (not looking)</div>
+        </div>
+
+        <section class="badge-section" aria-label="Badges">
+            <div class="badge-list">
+                <!-- Add badges by copying an image line and changing its file and description. -->
+                <img src="Files/Badges/Tf.svg" alt="Trans-Feminine" draggable="false">
+                <img src="Files/Badges/Eng.svg" alt="Can Speak English" draggable="false">
+                <img src="Files/Badges/NL.svg" alt="Can Speak Dutch" draggable="false">
+            </div>
+        </section>
+
+        <div class="bio">
+            My hobbies include <strong>drawing</strong> and <strong>animal care</strong>. I'm currently a volunteer with
+            <a href="https://plasmastarstudios.com"><strong>PSS</strong></a>.
+            My favorite color is <strong>pink</strong>.
+            <br><br>
+            <small><em>Note: I often prefer not to share media because of past negative experiences, both personal and shared.</em></small>
+        </div>
+
+        <div class="disclaimer">
+            This is a personal portfolio page for Flair Diva. It is not affiliated with Discord, Roblox, Steam, or
+            GitHub. The links below are personal profiles only.
+        </div>
+
+        <div class="social-links">
+            <a href="https://www.roblox.com/users/3969064026/profile" target="_blank" rel="noopener noreferrer" title="Roblox">
+                <img src="https://flairdiva.github.io/portifolio/Files/CustomRobloxIcon.png" class="roblox-icon" alt="Roblox">
+            </a>
+            <a href="https://steamcommunity.com/profiles/76561199861712823/" target="_blank" rel="noopener noreferrer" title="Steam">
+                <i class="fab fa-steam"></i>
+            </a>
+            <a href="https://github.com/flairdiva" target="_blank" rel="noopener noreferrer" title="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+
+        <a href="my-work/index.html" class="btn-work">My Activity</a>
+    </div>
+
+    <div class="container" id="Timezone">
+        <h1><inline-emoji src="Files/emojs/Time.svg" alt="Female symbol"></inline-emoji> Timezone</h1>
+        <div class="timezone-row">
+            <div class="timezone-info">
+                <h2>My local time</h2>
+                <div class="timezone-sub" id="tz-string">CET / CEST</div>
+            </div>
+
+            <div class="hybrid-clock">
+                <div class="hybrid-digital" id="mini-digital">00:00</div>
+                <div class="hybrid-hand h-hour" id="h-hour"></div>
+                <div class="hybrid-hand h-min" id="h-min"></div>
+                <div class="hybrid-hand h-sec" id="h-sec"></div>
+            </div>
+        </div>
+
+        <div class="schedule-box">
+            <h1>My Schedule</h1>
+            <iframe src="https://flairdiva.github.io/portifolio/calander/?profile=flair&allowselection=false" style="width: 100%; height: 300px" loading="lazy" frameborder="0"></iframe>
+        </div>
+    </div>
+
+
+
+    <div class="container" id="library">
+        <h1><inline-emoji src="Files/emojs/MagnifyingGlass.svg" alt="Female symbol"></inline-emoji> My Interests</h1>
+        <h3>Maybe we have something in common.</h3>
+        <!-- <h1>My Library</h1> -->
+        <h4>A collection of Steam games I own</h4>
+
+        <div class="game-grid" aria-label="Game library">
+            <!-- To add a game, copy a game-card and update its image and title. -->
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/PA.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/Palworld.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/ED.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/OSWME.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/oneshot.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/Undertale.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/library/SCPCB.png" alt="Card cover art" draggable="false">
+            </article>
+        </div>
+
+        <!-- <h1>Community's</h1> -->
+        <h4>Fandoms I'm part of</h4>
+
+        <div class="game-grid" aria-label="Game library">
+            <!-- To add a game, copy a game-card and update its image and title. -->
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/Communitys/InnovationInc.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/Communitys/AC.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/Communitys/OS.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/Communitys/PJM.png" alt="Card cover art" draggable="false">
+            </article>
+            <article class="game-card" tabindex="0" aria-label="Card">
+                <img src="Files/CardHelper/Communitys/Ayden.png" alt="Card cover art" draggable="false">
+            </article>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.badge-list img[alt]').forEach((badge) => {
+            const badgeItem = document.createElement('span');
+            badgeItem.className = 'badge-item';
+            badgeItem.dataset.hint = badge.alt;
+            badge.before(badgeItem);
+            badgeItem.append(badge);
+        });
+
+        document.querySelectorAll('inline-emoji[src]').forEach((emoji) => {
+            const image = document.createElement('img');
+            image.src = emoji.getAttribute('src');
+            image.alt = '';
+            image.draggable = false;
+            image.setAttribute('aria-hidden', 'true');
+            emoji.replaceChildren(image);
+
+            const description = emoji.getAttribute('alt');
+            if (description) {
+                emoji.setAttribute('role', 'img');
+                emoji.setAttribute('aria-label', description);
+            } else {
+                emoji.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        const protectedImageSelector = '.profile-banner img, .pfp-container img, .badge-list img, inline-emoji img';
+        document.addEventListener('dragstart', (event) => {
+            if (event.target instanceof HTMLImageElement && event.target.matches(protectedImageSelector)) {
+                event.preventDefault();
+            }
+        });
+        document.addEventListener('contextmenu', (event) => {
+            if (event.target instanceof HTMLImageElement && event.target.matches(protectedImageSelector)) {
+                event.preventDefault();
+            }
+        });
+
+        // --- Clock Logic ---
+        const hHour = document.getElementById('h-hour');
+        const hMin = document.getElementById('h-min');
+        const hSec = document.getElementById('h-sec');
+        const miniDigital = document.getElementById('mini-digital');
+        const tzString = document.getElementById('tz-string');
+
+        function updateClock() {
+            const now = new Date();
+            const amsTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Amsterdam" }));
+
+            const hours = amsTime.getHours();
+            const minutes = amsTime.getMinutes();
+            const seconds = amsTime.getSeconds();
+
+            const hrDeg = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
+            const minDeg = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+            const secDeg = ((seconds / 60) * 360) + 90;
+
+            hHour.style.transform = `rotate(${hrDeg}deg)`;
+            hMin.style.transform = `rotate(${minDeg}deg)`;
+            hSec.style.transform = `rotate(${secDeg}deg)`;
+
+            const displayHours = String(hours).padStart(2, '0');
+            const displayMins = String(minutes).padStart(2, '0');
+            miniDigital.textContent = `${displayHours}:${displayMins}`;
+
+            const baseStr = now.toLocaleString("en-US", { timeZone: "Europe/Amsterdam", timeZoneName: "short" });
+            if (baseStr.includes("GMT+2") || baseStr.includes("CEST")) {
+                tzString.textContent = "Amsterdam (Summer Time - CEST)";
+            } else {
+                tzString.textContent = "Amsterdam (Winter Time - CET)";
+            }
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+
+        // --- PFP Carousel & Age Logic ---
+        const birthDateString = "2009-08-04";
+
+        // Add each profile picture here; mark exactly one entry as the startup default.
+        const pfpData = [
+            { src: "Files/Winter.png", name: "Winter Version", alt: "Party/Special Version", url: "./Biography/index.html", isDefault: false },
+            { src: "Files/PFPNeutral.png", name: "Default Version", alt: "Default Version", url: "./Biography/index.html", isDefault: true },
+            { src: "Files/PFPSummer.png", name: "Summer Version", alt: "Summer Version", url: "./Biography/index.html", isDefault: false  }
+        ];
+
+        const defaultPfpIndices = pfpData.reduce((indices, pfp, index) => {
+            if (pfp.isDefault) indices.push(index);
+            return indices;
+        }, []);
+        if (defaultPfpIndices.length !== 1) {
+            throw new Error('The profile picture carousel must have exactly one startup default (isDefault: true).');
+        }
+        if (pfpData.length < 3) {
+            throw new Error('The profile picture carousel needs at least three entries to fill all visible positions.');
+        }
+
+        let centerIdx = defaultPfpIndices[0];
+        const pfpContainer = document.getElementById('pfp-container');
+        let pfpLeft = pfpContainer.querySelector('.pfp-left');
+        let pfpCenter = pfpContainer.querySelector('.pfp-center');
+        let pfpRight = pfpContainer.querySelector('.pfp-right');
+        let pfpIncoming = pfpContainer.querySelector('.pfp-incoming');
+        const pfpPopup = document.getElementById('pfp-popup');
+        const swipeCue = document.getElementById('swipe-cue');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let popupTimeout = null;
+        let isAnimating = false;
+        let pointerStart = null;
+        let ignoreCarouselClickUntil = 0;
+
+        function showSwipeCue() {
+            if (window.matchMedia('(max-width: 600px)').matches && !prefersReducedMotion) {
+                swipeCue.classList.add('is-visible');
+            }
+        }
+
+        if (document.readyState === 'complete') {
+            showSwipeCue();
+        } else {
+            window.addEventListener('load', showSwipeCue, { once: true });
+        }
+
+        function calculateAge(dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        const birthdateItem = document.getElementById('birthdate-item');
+        if (birthdateItem) {
+            const age = calculateAge(birthDateString);
+            birthdateItem.setAttribute('data-hint', `Age: ${age} years old`);
+        }
+
+        function showPfpPopup(name) {
+            pfpPopup.textContent = name;
+            pfpPopup.style.visibility = 'visible';
+            pfpPopup.style.opacity = '1';
+            if (popupTimeout) clearTimeout(popupTimeout);
+            popupTimeout = setTimeout(() => {
+                pfpPopup.style.opacity = '0';
+                pfpPopup.style.visibility = 'hidden';
+            }, 2000);
+        }
+
+        function updateCarousel(showPopup = false) {
+            const leftIdx = (centerIdx + pfpData.length - 1) % pfpData.length;
+            const rightIdx = (centerIdx + 1) % pfpData.length;
+
+            pfpLeft.src = pfpData[leftIdx].src;
+            pfpLeft.alt = pfpData[leftIdx].alt;
+            pfpLeft.dataset.index = leftIdx;
+            pfpLeft.removeAttribute('aria-hidden');
+            pfpCenter.src = pfpData[centerIdx].src;
+            pfpCenter.alt = pfpData[centerIdx].alt;
+            pfpCenter.dataset.index = centerIdx;
+            pfpCenter.removeAttribute('aria-hidden');
+            pfpRight.src = pfpData[rightIdx].src;
+            pfpRight.alt = pfpData[rightIdx].alt;
+            pfpRight.dataset.index = rightIdx;
+            pfpRight.removeAttribute('aria-hidden');
+            pfpIncoming.alt = '';
+            pfpIncoming.setAttribute('aria-hidden', 'true');
+
+            if (showPopup) showPfpPopup(pfpData[centerIdx].name);
+        }
+
+        updateCarousel(false);
+
+        function assignCarouselSlots(direction) {
+            const outgoing = direction > 0 ? pfpLeft : pfpRight;
+
+            if (direction > 0) {
+                pfpLeft = pfpCenter;
+                pfpCenter = pfpRight;
+                pfpRight = pfpIncoming;
+            } else {
+                pfpRight = pfpCenter;
+                pfpCenter = pfpLeft;
+                pfpLeft = pfpIncoming;
+            }
+
+            pfpIncoming = outgoing;
+            pfpLeft.className = 'pfp-left';
+            pfpCenter.className = 'pfp-center';
+            pfpRight.className = 'pfp-right';
+            pfpIncoming.className = 'pfp-incoming';
+        }
+
+        async function rotateCarousel(direction) {
+            if (isAnimating) return;
+
+            const nextCenterIdx = (centerIdx + direction + pfpData.length) % pfpData.length;
+            const incomingIdx = (nextCenterIdx + direction + pfpData.length) % pfpData.length;
+            const incomingImage = pfpIncoming;
+            incomingImage.src = pfpData[incomingIdx].src;
+            incomingImage.alt = pfpData[incomingIdx].alt;
+
+            if (prefersReducedMotion) {
+                assignCarouselSlots(direction);
+                centerIdx = nextCenterIdx;
+                updateCarousel(true);
+                return;
+            }
+
+            isAnimating = true;
+            incomingImage.className = `pfp-incoming pfp-enter-from-${direction > 0 ? 'right' : 'left'}`;
+            pfpContainer.classList.add('is-animating');
+
+            const slotWidth = pfpContainer.clientWidth / 3;
+            const shift = -direction * slotWidth;
+            const outgoing = direction > 0 ? pfpLeft : pfpRight;
+            const movingSide = direction > 0 ? pfpRight : pfpLeft;
+            const animations = [
+                outgoing.animate(
+                    [{ opacity: 0.5 }, { opacity: 0 }],
+                    { duration: 420, easing: 'ease', fill: 'forwards' }
+                ),
+                pfpCenter.animate(
+                    [
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: `translateX(${shift}px) scale(0.75)`, opacity: 0.5 }
+                    ],
+                    { duration: 420, easing: 'ease', fill: 'forwards' }
+                ),
+                movingSide.animate(
+                    [
+                        { transform: 'scale(0.75)', opacity: 0.5 },
+                        { transform: `translateX(${shift}px) scale(1)`, opacity: 1 }
+                    ],
+                    { duration: 420, easing: 'ease', fill: 'forwards' }
+                ),
+                incomingImage.animate(
+                    [
+                        { transform: `translateX(${direction * slotWidth}px) scale(0.75)`, opacity: 0 },
+                        { transform: 'scale(0.75)', opacity: 0.5 }
+                    ],
+                    { duration: 420, easing: 'ease', fill: 'forwards' }
+                )
+            ];
+
+            let completed = false;
+            try {
+                await Promise.all(animations.map(animation => animation.finished));
+                assignCarouselSlots(direction);
+                centerIdx = nextCenterIdx;
+                pfpContainer.classList.remove('is-animating');
+                animations.forEach(animation => animation.cancel());
+                updateCarousel(true);
+                completed = true;
+            } finally {
+                if (!completed) {
+                    animations.forEach(animation => animation.cancel());
+                    incomingImage.className = 'pfp-incoming';
+                }
+                pfpContainer.classList.remove('is-animating');
+                isAnimating = false;
+            }
+        }
+
+        function handleCarouselRotation(direction) {
+            rotateCarousel(direction).catch(error => {
+                console.error('Unable to animate the profile picture carousel.', error);
+            });
+        }
+
+        pfpContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const direction = Math.sign(e.deltaY);
+            if (direction !== 0) {
+                handleCarouselRotation(direction);
+            }
+        });
+
+        pfpContainer.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                pointerStart = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('pointerup', (e) => {
+            if (!pointerStart) return;
+
+            const deltaX = e.clientX - pointerStart.x;
+            const deltaY = e.clientY - pointerStart.y;
+            pointerStart = null;
+
+            if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                ignoreCarouselClickUntil = performance.now() + 500;
+                handleCarouselRotation(deltaX < 0 ? 1 : -1);
+            }
+        });
+
+        document.addEventListener('pointercancel', () => {
+            pointerStart = null;
+        });
+
+        pfpContainer.addEventListener('click', (e) => {
+            if (
+                isAnimating ||
+                performance.now() < ignoreCarouselClickUntil ||
+                !(e.target instanceof HTMLImageElement) ||
+                e.target.classList.contains('pfp-incoming')
+            ) {
+                return;
+            }
+            window.location.href = pfpData[Number(e.target.dataset.index)].url;
+        });
+
+        // --- Environmental Setup (Local file tag) ---
+        if (window.location.protocol === 'file:') {
+            document.title = "[LOCAL] " + document.title;
+        }
+    </script>
+</body>
+
+</html>
