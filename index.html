@@ -164,6 +164,29 @@
         .status.error { color: #a22d45; }
         .status.ok { color: #28723c; }
         .repo-summary { overflow-wrap: anywhere; }
+        .setup-steps { display: grid; gap: 12px; margin: 20px 0; }
+        .setup-step { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fffcfd; }
+        .setup-step-number { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: #6a293e; font-weight: 800; }
+        .setup-step p { margin: 4px 0 0; color: var(--muted); line-height: 1.45; }
+        .setup-step details { margin-top: 8px; }
+        .setup-step summary { color: #9c3d5a; font-weight: 700; cursor: pointer; }
+        .setup-hint { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: var(--canvas); line-height: 1.5; }
+        .pages-next-step { margin-top: 10px; padding: 12px; border-radius: 10px; background: var(--canvas); }
+        .pages-next-step ol { margin: 8px 0 0; padding-left: 22px; }
+        .pages-next-step li { margin: 5px 0; }
+        .publish-panel { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fffcfd; }
+        .publish-panel h3 { margin: 0 0 10px; }
+        .publish-steps { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+        .publish-step { display: flex; align-items: center; gap: 9px; color: var(--muted); }
+        .publish-step[data-state="done"] { color: #28723c; }
+        .publish-step[data-state="error"] { color: #a22d45; }
+        .publish-step-icon { display: inline-grid; place-items: center; width: 22px; height: 22px; flex: 0 0 22px; border: 2px solid currentColor; border-radius: 50%; font-size: .8rem; font-weight: 800; }
+        .publish-step[data-state="done"] .publish-step-icon { border-color: #28723c; }
+        .publish-step[data-state="current"] .publish-step-icon { border-color: #bd7b12; border-right-color: transparent; color: #bd7b12; animation: publish-spin .8s linear infinite; }
+        @keyframes publish-spin { to { transform: rotate(360deg); } }
+        .publish-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .publish-actions .button, .publish-actions button { min-height: 40px; }
+        .publish-actions a[hidden], .publish-actions button[hidden] { display: none; }
         dialog {
             width: min(680px, calc(100vw - 28px)); max-height: 88vh; overflow: auto;
             border: 1px solid var(--line); border-radius: 18px; padding: 25px;
@@ -180,6 +203,8 @@
             border-radius: 18px; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .portfolio-page * { box-sizing: border-box; }
+        inline-emoji { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.2em; line-height: 1; }
+        inline-emoji img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; user-select: none; }
         .portfolio-card {
             --card-padding: 25px;
             max-width: 650px; margin: 0 auto 15px; padding: var(--card-padding); overflow: hidden;
@@ -248,6 +273,9 @@
         .portfolio-extra { text-align: left; line-height: 1.55; overflow-wrap: anywhere; }
         .portfolio-extra img { display: block; max-width: 100%; max-height: 220px; object-fit: cover; border-radius: 10px; margin: 10px auto; }
         .emoji-picker { margin-top: 4px; }
+        .emoji-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .emoji-row button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; background: #f0e9ed; color: var(--ink); font-size: .83rem; }
+        .emoji-row img { width: 1.2em; height: 1.2em; object-fit: contain; }
         @media (max-width: 850px) {
             .steps-layout { grid-template-columns: 1fr; }
             .preview-sticky { position: static; }
@@ -276,7 +304,7 @@
 
         <section id="welcome-view" class="welcome panel">
             <h1>Make a portfolio that feels like you.</h1>
-            <p class="lead">Start a new portfolio or edit one previously created with Portfolio Studio. Your changes are previewed as you work. Publishing sends the finished <code>index.html</code> directly to a repository you choose.</p>
+            <p class="lead">Create your page or update one you already made. We’ll guide you through each step.</p>
             <div class="choice-grid">
                 <button class="choice" type="button" data-mode="new">
                     <strong>Set up a new portfolio</strong>
@@ -287,35 +315,41 @@
                     <span>Open a portfolio made by this editor and update its supported fields.</span>
                 </button>
             </div>
-            <div class="warning"><strong>Before connecting GitHub:</strong> you will need your own repository and a Fine-grained personal access token. The editor never saves the token in browser storage, but the token is necessarily present in this page's memory while you use it.</div>
-            <p class="small">This tool asks you to follow GitHub's <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct" target="_blank" rel="noopener noreferrer">Community Code of Conduct</a>. The notice records your agreement; it cannot monitor or guarantee anyone's conduct.</p>
+            <p class="small">You’ll need a GitHub account. We’ll walk you through creating a repository and a short-lived access token.</p>
         </section>
 
         <section id="connect-view" class="panel hidden" aria-labelledby="connect-title">
             <h1 id="connect-title">Connect your repository</h1>
             <p class="lead" id="connect-intro"></p>
-            <div class="note repo-summary">
-                <strong>Recommended repository:</strong> create one on your own GitHub account, with a name such as <code>portfolio</code> or <code>me</code>. The name appears in the Pages address (usually <code>username.github.io/repository-name/</code>). For a new portfolio, leave it empty except for an optional README.
+            <div class="setup-steps" aria-label="GitHub setup">
+                <div class="setup-step" id="repository-setup-step">
+                    <span class="setup-step-number" aria-hidden="true">1</span>
+                    <div><strong>Create your repository</strong><p>A repository is the folder where your website lives. Name it <code>portfolio</code> or <code>me</code>.</p>
+                        <details><summary>Show me how</summary><p>Open <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">GitHub’s new repository page</a>. Give it a name. For a new portfolio, leave it empty (a README is okay), then choose Create repository. Your website will be public when published.</p></details>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <span class="setup-step-number" id="token-step-number" aria-hidden="true">2</span>
+                    <div><strong>Make a temporary access token</strong><p>This is a one-day key that lets this page save files to your repository.</p>
+                        <details><summary>Show me the safe settings</summary><ol><li>Open <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">Fine-grained tokens</a> and choose Generate new token.</li><li>Set expiration to 1 day and choose only the repository from step 1.</li><li>Allow <strong>Contents: read and write</strong>. Leave all other permissions off.</li><li>Create the token and copy it. Anyone with this key can change files in that repository; never share it.</li></ol></details>
+                    </div>
+                </div>
             </div>
             <div class="field">
-                <label for="repository">Repository name</label>
-                <input id="repository" autocomplete="off" placeholder="portfolio" required>
-                <span class="small">Enter only the repository name, not a URL. The repository must belong to the GitHub account associated with your token.</span>
+                <label for="repository"><span id="repository-step-number">3</span>. Type owner/repository</label>
+                <input id="repository" autocomplete="off" placeholder="your-name/portfolio" required>
+                <span class="small">Enter the owner and repository name, not the full web address.</span>
             </div>
             <div class="field">
-                <label for="pat">Fine-grained personal access token</label>
+                <label for="pat">Paste your temporary token</label>
                 <input id="pat" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" required>
-                <span class="small">This page keeps it in memory only. Refreshing or closing the page clears it. Never paste a token into a public/shared computer.</span>
+                <span class="small">Only used in this page. Refreshing clears it.</span>
             </div>
-            <label class="inline-check">
-                <input id="pages-permission" type="checkbox">
-                <span>I separately granted <strong>Pages: read and write</strong> for this repository. Try to enable GitHub Pages after publishing. This is optional; without it, set Pages up manually.</span>
-            </label>
-            <p class="small">The minimum token permissions for saving are <strong>Metadata: read-only</strong> and <strong>Contents: read and write</strong>, restricted to this one repository, with an expiry no longer than 24 hours. Pages automation additionally needs Pages read/write. Do not grant account-wide access or extra permissions.</p>
-            <div class="warning"><strong>Important limitation:</strong> GitHub does not let this page inspect a PAT's expiry, repository allow-list, or full permission list. It can check the token against the selected account/repository and whether that repository is writable, but it cannot prove the settings above or reliably distinguish an over-scoped token. Continue only after checking those settings yourself. If you made a broad or long-lived token, revoke it in GitHub and make a restricted one instead.</div>
+            <p class="small">GitHub asks you to choose <strong>Metadata: read-only</strong> automatically. We check that the token can write to this repository, but GitHub does not tell this page the token’s expiry, repository limit, or all its permissions. If you gave it extra access, delete it in GitHub and make a new one.</p>
+            <div class="setup-hint"><strong>About your website:</strong> This editor does not need Pages access. After saving, we’ll show you three simple clicks to publish your site.</div>
             <div class="row">
                 <a class="button secondary" href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">Open PAT settings ↗</a>
-                <button id="connect-github" type="button">Verify access</button>
+                <button id="connect-github" type="button">Check my setup</button>
                 <button id="back-home" class="secondary" type="button">Back</button>
             </div>
             <p id="connect-status" class="status" role="status" aria-live="polite"></p>
@@ -356,16 +390,11 @@
     </main>
 
     <dialog id="consent-dialog" aria-labelledby="consent-title">
-        <h2 id="consent-title">Before you use a GitHub token</h2>
-        <p>A personal access token (PAT) is a secret that lets an application act on GitHub as you, within the permissions you grant. Anyone who obtains it may use those permissions until it expires or you revoke it. This editor sends it only to GitHub's API and does not intentionally store it, but a browser-based tool cannot protect it from a compromised device, browser extension, or modified page.</p>
-        <ol>
-            <li>Create a repository <strong>on your own GitHub account</strong>. For a new portfolio, use an empty repository (an optional README is okay). A name like <code>portfolio</code> or <code>me</code> affects the final Pages URL.</li>
-            <li>In <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">GitHub Fine-grained personal access token settings</a>, create a Fine-grained token, set its expiration to <strong>at most 24 hours</strong>, and select only this one repository.</li>
-            <li>Grant only <strong>Metadata: read-only</strong> and <strong>Contents: read and write</strong>. If you want this tool to configure Pages, also grant <strong>Pages: read and write</strong>; otherwise configure Pages yourself after publishing.</li>
-            <li>Never grant access to all repositories, account permissions, or unrelated permissions. If a token is broader or lasts longer than intended, revoke it and create another one. You can revoke it at <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">PAT settings</a>.</li>
-        </ol>
-        <div class="warning">GitHub's API does not expose enough token metadata for this page to enforce the expiry, repository restriction, or exact permission checks. The page will verify the selected repository is accessible and writable; <strong>you are responsible for confirming the PAT settings yourself</strong>. No token is stored across a refresh.</div>
-        <label class="inline-check"><input id="terms-accept" type="checkbox"><span>I understand how this PAT works, will use a Fine-grained token with the restricted settings above, will follow GitHub's <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct" target="_blank" rel="noopener noreferrer">Community Code of Conduct</a>, and accept that this tool will use my token to update only the repository I select.</span></label>
+        <h2 id="consent-title">Before we connect</h2>
+        <p>A personal access token is a temporary key. It lets this page save your portfolio to the one repository you choose. This page forgets the key when refreshed.</p>
+        <div class="setup-hint"><strong>Keep it safe:</strong> Fine-grained token · expires in 1 day · one repository · Contents read/write only.</div>
+        <details><summary>What am I agreeing to?</summary><p>GitHub’s API does not let this page verify token expiry or permissions. Do not use a shared computer, never share the token, and delete it in GitHub if you gave it more access than listed. By continuing, you agree to follow GitHub’s <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct" target="_blank" rel="noopener noreferrer">Community Code of Conduct</a>.</p></details>
+        <label class="inline-check"><input id="terms-accept" type="checkbox"><span>I understand and agree.</span></label>
         <div class="dialog-actions">
             <button id="cancel-consent" class="secondary" type="button">Cancel</button>
             <button id="accept-consent" type="button" disabled>Continue to setup</button>
@@ -374,13 +403,28 @@
 
     <dialog id="save-dialog" aria-labelledby="save-title">
         <h2 id="save-title">Confirm publishing</h2>
-        <p id="save-message">By confirming, you accept that this tool will use your PAT to add or upload changes to the repository selected for this portfolio. Do you wish to proceed?</p>
-        <div class="warning">The token is sent to GitHub to commit your portfolio. Review the preview and selected repository before continuing.</div>
+        <p id="save-message">By confirming, you allow this tool to use your PAT to update the selected repository. Continue?</p>
+        <p class="small">Saving to <strong id="publish-target">your selected repository</strong>.</p>
         <div class="dialog-actions">
             <button id="cancel-save" class="secondary" type="button">Cancel</button>
             <button id="confirm-save" type="button">Confirm and publish</button>
         </div>
-        <p id="save-status" class="status" role="status" aria-live="polite"></p>
+        <div id="save-status" class="status" role="status" aria-live="polite"></div>
+        <section id="publish-panel" class="publish-panel hidden" aria-labelledby="publish-title">
+            <h3 id="publish-title">Publishing your portfolio</h3>
+            <ol class="publish-steps">
+                <li id="publish-commit-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Save your changes to GitHub</span></li>
+                <li id="publish-build-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Build your website</span></li>
+                <li id="publish-live-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Your portfolio is live</span></li>
+            </ol>
+            <p id="publish-detail" class="status" role="status" aria-live="polite"></p>
+            <div class="publish-actions">
+                <a id="publish-actions-link" class="button secondary" target="_blank" rel="noopener noreferrer" hidden>View build on GitHub ↗</a>
+                <a id="visit-portfolio-link" class="button" target="_blank" rel="noopener noreferrer" hidden>Visit portfolio ↗</a>
+                <button id="copy-portfolio-link" class="secondary" type="button" hidden>Copy link</button>
+                <button id="refresh-publish-status" class="secondary" type="button" hidden>Check again</button>
+            </div>
+        </section>
     </dialog>
 
     <dialog id="container-dialog" aria-labelledby="container-dialog-title">
@@ -407,7 +451,7 @@
                 { id: "profile", title: "Profile images", description: "Add an optional wide banner and one picture or a small carousel. Images are embedded in the portfolio when you publish." },
                 { id: "identity", title: "Identity and stats", description: "Choose your display name and add any stat bars you like. The examples are suggestions, not requirements. Date stats show an age/distance hint on hover." },
                 { id: "badges", title: "Badges", description: "Choose any of the included badges to show under your stats. You can skip all of them." },
-                { id: "bio", title: "About you", description: "Write the short bio shown in the profile card. Use the emoji buttons to insert familiar :emoji_name: aliases." },
+                { id: "bio", title: "About you", description: "Write the short bio shown in the profile card. Use the custom emoji picker to insert icons from Files/emojs." },
                 { id: "socials", title: "Social links", description: "Optional links to your profiles. Only secure https:// links are published. Custom icon URLs are optional." },
                 { id: "timezone", title: "Timezone", description: "Optional. Add a live local clock. Confirm that the displayed time matches your current time in the selected timezone." },
                 { id: "interests", title: "Interests", description: "Optional vertical image cards, grouped by categories such as Games I own, Hobbies, or Communities." },
@@ -431,12 +475,10 @@
                 interests: { categories: "Games I own, Hobbies I like, Communities I'm in", items: [] },
                 extras: []
             };
-            const EMOJIS = {
-                sparkles: "✨", heart: "❤️", wave: "👋", smile: "😊", star: "⭐",
-                art: "🎨", music: "🎵", game: "🎮", cat: "🐈", flower: "🌸"
-            };
+            const EMOJI_MANIFEST = "Files/emojs/emoji-manifest.json";
             const PORTFOLIO_CSS = `
                 *{box-sizing:border-box}body{margin:0;padding:24px;background:#fffafa;color:#4a4a4a;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+                inline-emoji{display:inline-block;width:1.2em;height:1.2em;vertical-align:-.2em;line-height:1}inline-emoji img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;user-select:none}
                 .portfolio-page{--p-accent:#ff85a2;--p-soft:#ffe4e9;max-width:740px;margin:auto}
                 .portfolio-card{--card-padding:32px;margin:0 auto 18px;padding:var(--card-padding);overflow:hidden;border-radius:26px;background:#fff;text-align:center;box-shadow:0 12px 30px color-mix(in srgb,var(--p-accent) 15%,transparent)}
                 .portfolio-banner{position:relative;height:230px;margin:calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) -75px;overflow:hidden}.portfolio-banner img{display:block;width:100%;height:100%;object-fit:cover;object-position:center var(--banner-position,45%);-webkit-user-drag:none;user-select:none}.portfolio-banner:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(to bottom,transparent,#fff);pointer-events:none}
@@ -486,7 +528,15 @@
             let existingSha = null;
             let managedPortfolio = false;
             let saveInProgress = false;
+            let publishCheckTimer = null;
+            let publishCheckGeneration = 0;
+            let currentPublishCommitSha = "";
             const badgeData = new Map();
+            let badgeAssetsLoad = null;
+            let emojiCatalog = [];
+            const emojiByName = new Map();
+            let emojiCatalogLoaded = false;
+            let emojiCatalogLoad = null;
             const $ = (selector) => document.querySelector(selector);
             const welcomeView = $("#welcome-view");
             const connectView = $("#connect-view");
@@ -517,9 +567,30 @@
             }
 
             function textWithEmoji(value) {
-                return escapeHtml(value).replace(/:([a-z0-9_+-]+):/gi, (match, name) =>
-                    Object.prototype.hasOwnProperty.call(EMOJIS, name.toLowerCase()) ? EMOJIS[name.toLowerCase()] : match
-                );
+                return escapeHtml(value).replace(/:([a-z0-9_+-]+):/gi, (match, name) => {
+                    const emoji = emojiByName.get(name.toLowerCase());
+                    return emoji
+                        ? `<inline-emoji src="${escapeHtml(emoji.path)}" alt="${escapeHtml(emoji.label)}"></inline-emoji>`
+                        : match;
+                });
+            }
+
+            function renderInlineEmojis(container) {
+                container.querySelectorAll("inline-emoji[src]").forEach((emoji) => {
+                    const image = document.createElement("img");
+                    image.src = emoji.getAttribute("src");
+                    image.alt = "";
+                    image.draggable = false;
+                    image.setAttribute("aria-hidden", "true");
+                    emoji.replaceChildren(image);
+                    const description = emoji.getAttribute("alt");
+                    if (description) {
+                        emoji.setAttribute("role", "img");
+                        emoji.setAttribute("aria-label", description);
+                    } else {
+                        emoji.setAttribute("aria-hidden", "true");
+                    }
+                });
             }
 
             function dateLabel(iso) {
@@ -630,27 +701,74 @@
                 element.className = `status${kind ? ` ${kind}` : ""}`;
             }
 
-            async function loadBadgeAssets() {
-                if (window.location.protocol === "file:") {
-                    const warning = document.createElement("p");
-                    warning.className = "note";
-                    warning.textContent = "Badge previews need the editor served over HTTP or HTTPS. The badge gallery will be available when you open this page from your hosted site.";
-                    welcomeView.append(warning);
-                    return;
+            function loadBadgeAssets() {
+                if (!badgeAssetsLoad) {
+                    badgeAssetsLoad = (async () => {
+                        if (window.location.protocol === "file:") {
+                            const warning = document.createElement("p");
+                            warning.className = "note";
+                            warning.textContent = "Badge previews need the editor served over HTTP or HTTPS. The badge gallery will be available when you open this page from your hosted site.";
+                            welcomeView.append(warning);
+                            return;
+                        }
+                        const results = await Promise.all(BADGES.map(async (badge) => {
+                            const response = await fetch(badge.path);
+                            if (!response.ok) throw new Error(`Could not load the badge gallery (${badge.path}). Open Portfolio Studio from its hosted site and reload.`);
+                            const blob = await response.blob();
+                            const data = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(String(reader.result));
+                                reader.onerror = () => reject(new Error(`Could not read ${badge.path}.`));
+                                reader.readAsDataURL(blob);
+                            });
+                            return [badge.name, data];
+                        }));
+                        for (const [name, data] of results) badgeData.set(name, data);
+                    })();
                 }
-                const results = await Promise.all(BADGES.map(async (badge) => {
-                    const response = await fetch(badge.path);
-                    if (!response.ok) throw new Error(`Could not load the badge gallery (${badge.path}). Open Portfolio Studio from its hosted site and reload.`);
-                    const blob = await response.blob();
-                    const data = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(String(reader.result));
-                        reader.onerror = () => reject(new Error(`Could not read ${badge.path}.`));
-                        reader.readAsDataURL(blob);
-                    });
-                    return [badge.name, data];
-                }));
-                for (const [name, data] of results) badgeData.set(name, data);
+                return badgeAssetsLoad.catch((error) => {
+                    badgeAssetsLoad = null;
+                    throw error;
+                });
+            }
+
+            function loadEmojiCatalog() {
+                if (emojiCatalogLoaded) return Promise.resolve();
+                if (!emojiCatalogLoad) {
+                    emojiCatalogLoad = (async () => {
+                        if (window.location.protocol === "file:") {
+                            throw new Error("Custom emoji previews need Portfolio Studio served over HTTP or HTTPS.");
+                        }
+                        const response = await fetch(EMOJI_MANIFEST, { cache: "no-cache" });
+                        if (!response.ok) throw new Error(`Could not load the custom emoji list (${EMOJI_MANIFEST}).`);
+                        const entries = await response.json();
+                        if (!Array.isArray(entries)) throw new Error("The custom emoji list must be a JSON array.");
+                        emojiCatalog = entries.filter((emoji) =>
+                            emoji &&
+                            /^[a-z0-9_+-]+$/i.test(emoji.name) &&
+                            typeof emoji.label === "string" &&
+                            typeof emoji.path === "string" &&
+                            /^Files\/emojs\/[A-Za-z0-9_.-]+$/.test(emoji.path) &&
+                            ![".", ".."].includes(emoji.path.slice("Files/emojs/".length))
+                        );
+                        if (emojiCatalog.length !== entries.length) {
+                            throw new Error("The custom emoji list contains an invalid entry. Check Files/emojs/emoji-manifest.json.");
+                        }
+                        const names = new Set();
+                        for (const emoji of emojiCatalog) {
+                            if (names.has(emoji.name.toLowerCase())) throw new Error(`The custom emoji name "${emoji.name}" is duplicated in the manifest.`);
+                            names.add(emoji.name.toLowerCase());
+                        }
+                        emojiByName.clear();
+                        for (const emoji of emojiCatalog) emojiByName.set(emoji.name.toLowerCase(), emoji);
+                        emojiCatalogLoaded = true;
+                        if (!wizardView.classList.contains("hidden")) renderWizard();
+                    })();
+                }
+                return emojiCatalogLoad.catch((error) => {
+                    emojiCatalogLoad = null;
+                    throw error;
+                });
             }
 
             function portfolioMarkup(data) {
@@ -845,6 +963,21 @@
             function generatedPortfolioRuntime() {
                 const root = document.querySelector(".portfolio-page");
                 if (!root) return;
+                root.querySelectorAll("inline-emoji[src]").forEach((emoji) => {
+                    const image = document.createElement("img");
+                    image.src = emoji.getAttribute("src");
+                    image.alt = "";
+                    image.draggable = false;
+                    image.setAttribute("aria-hidden", "true");
+                    emoji.replaceChildren(image);
+                    const description = emoji.getAttribute("alt");
+                    if (description) {
+                        emoji.setAttribute("role", "img");
+                        emoji.setAttribute("aria-label", description);
+                    } else {
+                        emoji.setAttribute("aria-hidden", "true");
+                    }
+                });
                 const relativeDateHint = (iso) => {
                     if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return "";
                     const date = new Date(`${iso}T00:00:00`);
@@ -1056,6 +1189,7 @@
 
             function renderPreview() {
                 preview.innerHTML = portfolioMarkup(config);
+                renderInlineEmojis(preview);
                 for (const date of preview.querySelectorAll("[data-date]")) {
                     date.dataset.hint = relativeDateHint(date.dataset.date);
                 }
@@ -1064,6 +1198,7 @@
                 initializePreviewBehavior(preview.querySelector(".portfolio-page"));
                 if (!editorView.classList.contains("hidden")) {
                     editorPreview.innerHTML = portfolioMarkup(config);
+                    renderInlineEmojis(editorPreview);
                     for (const date of editorPreview.querySelectorAll("[data-date]")) date.dataset.hint = relativeDateHint(date.dataset.date);
                     initializePreviewBehavior(editorPreview.querySelector(".portfolio-page"));
                 }
@@ -1085,9 +1220,9 @@
             }
 
             function emojiPicker(target) {
-                return `<div class="emoji-picker"><span class="small">Insert emoji shortcode:</span><div class="emoji-row">${Object.entries(EMOJIS).map(([name, emoji]) =>
-                    `<button type="button" data-emoji-target="${escapeHtml(target)}" data-emoji="${escapeHtml(name)}" title="Insert :${escapeHtml(name)}:">${emoji} :${escapeHtml(name)}:</button>`
-                ).join("")}</div></div>`;
+                return `<div class="emoji-picker"><span class="small">Insert a custom inline emoji:</span><div class="emoji-row">${emojiCatalog.map((emoji) =>
+                    `<button type="button" data-emoji-target="${escapeHtml(target)}" data-emoji="${escapeHtml(emoji.name)}" title="Insert :${escapeHtml(emoji.name)}:"><img src="${escapeHtml(emoji.path)}" alt=""> ${escapeHtml(emoji.label)}</button>`
+                ).join("") || `<span class="small">Custom emoji list is loading.</span>`}</div></div>`;
             }
 
             function renderWizard() {
@@ -1235,6 +1370,7 @@
                 if (!rows.length) $("#editor-items").innerHTML = `<div class="editor-empty">No containers yet.</div>`;
                 else $("#editor-items").innerHTML = rows.join("");
                 editorPreview.innerHTML = portfolioMarkup(config);
+                renderInlineEmojis(editorPreview);
                 for (const date of editorPreview.querySelectorAll("[data-date]")) date.dataset.hint = relativeDateHint(date.dataset.date);
                 initializePreviewBehavior(editorPreview.querySelector(".portfolio-page"));
                 updatePreviewClocks();
@@ -1418,10 +1554,66 @@
                 normalized.interests = { ...DEFAULTS.interests, ...(normalized.interests || {}) };
                 const legacyData = structuredClone(normalized);
                 if (!Object.prototype.hasOwnProperty.call(data.profile || {}, "banner")) delete legacyData.profile.banner;
-                if (normalizeGeneratedPortfolio(generatedPortfolio(normalized)) !== html && legacyGeneratedPortfolio(legacyData) !== html) {
+                if (
+                    normalizeGeneratedPortfolio(generatedPortfolio(normalized)) !== html &&
+                    legacyGeneratedPortfolio(legacyData) !== html &&
+                    !isCompatibleManagedPortfolio(html, normalized)
+                ) {
                     throw new Error("Unsupported changes were found in index.html. It may have been altered or corrupted, so editing was refused.");
                 }
                 return normalized;
+            }
+
+            function normalizePortfolioText(value) {
+                return String(value || "")
+                    .replace(/:[a-z0-9_+-]+:/gi, "")
+                    .replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "")
+                    .replace(/\s+/g, " ")
+                    .trim();
+            }
+
+            function isCompatibleManagedPortfolio(html, data) {
+                const actual = new DOMParser().parseFromString(html, "text/html");
+                const dataScripts = actual.querySelectorAll('script#portfolio-studio-data[type="application/json"]');
+                const scripts = [...actual.querySelectorAll("script")];
+                const root = actual.querySelector(".portfolio-page");
+                const hasInlineHandler = [...actual.querySelectorAll("*")].some((element) =>
+                    [...element.attributes].some((attribute) => /^on/i.test(attribute.name))
+                );
+                if (
+                    !actual.querySelector('meta[name="portfolio-studio-format"][content="1"]') ||
+                    !root ||
+                    actual.querySelectorAll(".portfolio-page").length !== 1 ||
+                    dataScripts.length !== 1 ||
+                    scripts.length !== 2 ||
+                    scripts.some((script) => script.src || script.parentElement !== actual.body) ||
+                    hasInlineHandler ||
+                    actual.querySelector("iframe, object, embed, form, input")
+                ) {
+                    return false;
+                }
+
+                const expected = new DOMParser().parseFromString(portfolioMarkup(data), "text/html").querySelector(".portfolio-page");
+                if (!expected || actual.body.children.length !== 3) return false;
+                const actualContent = root.cloneNode(true);
+                const expectedContent = expected.cloneNode(true);
+                actualContent.querySelector("[data-timezone]")?.closest("section")?.remove();
+                expectedContent.querySelector("[data-timezone]")?.closest("section")?.remove();
+                if (normalizePortfolioText(actualContent.textContent) !== normalizePortfolioText(expectedContent.textContent)) return false;
+
+                const listValues = (container, selector, attribute) => [...container.querySelectorAll(selector)]
+                    .map((element) => element.getAttribute(attribute) || "")
+                    .sort();
+                const canCompareBadges = data.badges.every((name) => badgeData.has(name));
+                const contentImages = (container) => [...container.querySelectorAll("img[src]")]
+                    .filter((element) => canCompareBadges || !element.closest(".portfolio-badges"))
+                    .map((element) => element.getAttribute("src") || "")
+                    .sort();
+                const actualEmojiSources = listValues(root, "inline-emoji[src]", "src");
+                const expectedEmojiSources = listValues(expected, "inline-emoji[src]", "src");
+                return JSON.stringify(listValues(root, "a[href]", "href")) === JSON.stringify(listValues(expected, "a[href]", "href")) &&
+                    JSON.stringify(contentImages(root)) === JSON.stringify(contentImages(expected)) &&
+                    (actualEmojiSources.length === 0 || JSON.stringify(actualEmojiSources) === JSON.stringify(expectedEmojiSources));
             }
 
             async function githubRequest(path, options = {}) {
@@ -1437,19 +1629,65 @@
                 const body = await response.json().catch(() => ({}));
                 if (!response.ok) {
                     const detail = body.message || `GitHub returned HTTP ${response.status}.`;
-                    const error = new Error(`${detail} Check that the Fine-grained token is valid and has the stated access to this repository.`);
+                    const method = options.method || "GET";
+                    const acceptedPermissions = response.headers.get("X-Accepted-GitHub-Permissions");
+                    const required = acceptedPermissions ? ` GitHub says this endpoint accepts: ${acceptedPermissions}.` : "";
+                    const error = new Error(`${detail} (${method} ${path}, HTTP ${response.status}).${required} Check the selected repository and token access.`);
                     error.status = response.status;
+                    error.path = path;
+                    error.method = method;
                     throw error;
                 }
                 return body;
             }
 
+            function usedEmojiNames(value, names = new Set()) {
+                if (typeof value === "string") {
+                    for (const match of value.matchAll(/:([a-z0-9_+-]+):/gi)) {
+                        const name = match[1].toLowerCase();
+                        if (emojiByName.has(name)) names.add(name);
+                    }
+                } else if (Array.isArray(value)) {
+                    value.forEach((item) => usedEmojiNames(item, names));
+                } else if (value && typeof value === "object") {
+                    Object.values(value).forEach((item) => usedEmojiNames(item, names));
+                }
+                return names;
+            }
+
+            async function ensureEmojiAssets(data) {
+                const emojis = [...usedEmojiNames(data)].map((name) => emojiByName.get(name));
+                for (const emoji of emojis) {
+                    const contentsPath = emoji.path.split("/").map(encodeURIComponent).join("/");
+                    try {
+                        await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/contents/${contentsPath}`);
+                        continue;
+                    } catch (error) {
+                        if (error.status !== 404) throw error;
+                    }
+                    const response = await fetch(emoji.path);
+                    if (!response.ok) throw new Error(`Could not read the custom emoji asset (${emoji.path}).`);
+                    const mimeType = response.headers.get("content-type") || "application/octet-stream";
+                    if (!mimeType.startsWith("image/")) throw new Error(`The custom emoji asset is not served as an image (${emoji.path}).`);
+                    const content = dataUriFromBytes(new Uint8Array(await response.arrayBuffer()), mimeType).split(",")[1];
+                    await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/contents/${contentsPath}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            message: `Add custom emoji: ${emoji.name}`,
+                            content
+                        })
+                    });
+                }
+            }
+
             async function connectToGitHub() {
                 const status = $("#connect-status");
-                const repoName = $("#repository").value.trim();
+                const repoPath = $("#repository").value.trim();
                 const suppliedToken = $("#pat").value.trim();
-                if (!/^[A-Za-z0-9_.-]+$/.test(repoName) || repoName === "." || repoName === "..") {
-                    showStatus(status, "Enter a valid repository name (not a URL).", "error");
+                const repoMatch = repoPath.match(/^([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}))\/([A-Za-z0-9_.-]+)$/);
+                if (!repoMatch || repoMatch[2] === "." || repoMatch[2] === "..") {
+                    showStatus(status, "Enter the repository as owner/name, for example alex/portfolio.", "error");
                     return;
                 }
                 if (!suppliedToken) {
@@ -1460,11 +1698,12 @@
                 $("#connect-github").disabled = true;
                 showStatus(status, "Checking the token and selected repository with GitHub…");
                 try {
-                    const user = await githubRequest("/user");
-                    account = user.login;
+                    await loadEmojiCatalog();
+                    account = repoMatch[1];
+                    const repoName = repoMatch[2];
                     const repo = await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repoName)}`);
                     if (repo.owner?.login?.toLowerCase() !== account.toLowerCase()) {
-                        throw new Error("The selected repository is not owned by the account verified by this token. Choose your own repository.");
+                        throw new Error("The repository owner does not match the owner you entered. Check the repository name.");
                     }
                     if (!repo.permissions?.push && !repo.permissions?.admin) {
                         throw new Error("This token does not appear to have write access to the selected repository.");
@@ -1528,20 +1767,155 @@
                 return sha;
             }
 
-            async function enablePagesIfRequested() {
-                if (!$("#pages-permission").checked) return "";
+            function setPublishStep(selector, state) {
+                const step = $(selector);
+                step.dataset.state = state;
+                step.querySelector(".publish-step-icon").textContent = state === "done" ? "✓" : state === "error" ? "!" : "";
+            }
+
+            function pagesSiteUrl() {
+                const owner = account.toLowerCase();
+                const repoName = repository.name;
+                return repoName.toLowerCase() === `${owner}.github.io`
+                    ? `https://${owner}.github.io/`
+                    : `https://${owner}.github.io/${encodeURIComponent(repoName)}/`;
+            }
+
+            function showPublishRetry(message, title = "Build status needs a check") {
+                $("#publish-title").textContent = title;
+                setPublishStep("#publish-build-step", "pending");
+                $("#publish-detail").textContent = message;
+                $("#refresh-publish-status").hidden = false;
+            }
+
+            async function checkPagesDeployment(commitSha, attempt, generation) {
+                if (generation !== publishCheckGeneration) return;
+                clearTimeout(publishCheckTimer);
+                publishCheckTimer = null;
+                $("#refresh-publish-status").hidden = true;
+                const owner = encodeURIComponent(account);
+                const repoName = encodeURIComponent(repository.name);
+                const runsUrl = `https://api.github.com/repos/${owner}/${repoName}/actions/runs?head_sha=${encodeURIComponent(commitSha)}&per_page=20`;
                 try {
-                    await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/pages`);
-                    return " GitHub Pages is already enabled.";
+                    const response = await fetch(runsUrl, {
+                        headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+                    });
+                    if (generation !== publishCheckGeneration) return;
+                    if (!response.ok) {
+                        if (response.status === 404 || response.status === 403) {
+                            showPublishRetry("GitHub did not allow a public build-status check. This can happen when the repository is private or the API is limiting requests. This page will not use your token for Actions access. Open Actions to check the build.", "Build status unavailable");
+                            return;
+                        }
+                        throw new Error(`GitHub returned HTTP ${response.status} while checking the build.`);
+                    }
+                    const result = await response.json();
+                    if (generation !== publishCheckGeneration) return;
+                    const runs = Array.isArray(result.workflow_runs) ? result.workflow_runs : [];
+                    const run = runs.find((item) =>
+                        item.head_sha === commitSha &&
+                        (`${item.name || ""} ${item.path || ""}`).toLowerCase().includes("pages")
+                    );
+                    if (run) {
+                        const runId = encodeURIComponent(String(run.id));
+                        $("#publish-actions-link").href = `https://github.com/${owner}/${repoName}/actions/runs/${runId}`;
+                        $("#publish-actions-link").hidden = false;
+                        if (run.status === "completed") {
+                            if (run.conclusion === "success") {
+                                setPublishStep("#publish-build-step", "done");
+                                setPublishStep("#publish-live-step", "done");
+                                $("#publish-title").textContent = "Your portfolio is live!";
+                                $("#publish-detail").textContent = "GitHub finished building and publishing your site.";
+                                $("#visit-portfolio-link").href = pagesSiteUrl();
+                                $("#visit-portfolio-link").hidden = false;
+                                $("#copy-portfolio-link").hidden = false;
+                                $("#pages-setup-instructions").hidden = true;
+                            } else {
+                                setPublishStep("#publish-build-step", "error");
+                                $("#publish-title").textContent = "GitHub could not publish the site";
+                                $("#publish-detail").textContent = `The Pages build finished with status “${run.conclusion || "unknown"}”. Open the build on GitHub to see what went wrong.`;
+                                $("#refresh-publish-status").hidden = false;
+                            }
+                            return;
+                        }
+                        setPublishStep("#publish-build-step", "current");
+                        $("#publish-title").textContent = "GitHub is building your website";
+                        $("#publish-detail").textContent = "This can take a little while. You can leave this window open or view the live build on GitHub.";
+                    } else {
+                        setPublishStep("#publish-build-step", "current");
+                        $("#publish-title").textContent = "Waiting for GitHub to start the build";
+                        $("#publish-detail").textContent = "GitHub has your changes. The Pages build starts when Pages is enabled for this repository.";
+                    }
+                    if (attempt >= 24) {
+                        showPublishRetry("If you have not enabled Pages yet, follow the steps below, then choose Check again.", "Still waiting for the Pages build");
+                        return;
+                    }
+                    publishCheckTimer = window.setTimeout(
+                        () => checkPagesDeployment(commitSha, attempt + 1, generation),
+                        5000
+                    );
                 } catch (error) {
-                    if (error.status !== 404 && !String(error.message).includes("Not Found")) throw error;
+                    if (generation !== publishCheckGeneration) return;
+                    showPublishRetry(`Could not check the Pages build: ${error.message} You can open Actions on GitHub to check it instead.`, "Could not check the build");
                 }
-                await githubRequest(`/repos/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/pages`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ source: { branch: repository.default_branch || "main", path: "/" } })
-                });
-                return " GitHub Pages was enabled; it may take a few minutes to publish.";
+            }
+
+            function showPortfolioSaved(commitSha) {
+                const status = $("#save-status");
+                status.replaceChildren();
+                status.className = "status ok";
+                clearTimeout(publishCheckTimer);
+                publishCheckTimer = null;
+                currentPublishCommitSha = commitSha;
+                const saved = document.createElement("p");
+                saved.textContent = `Saved to ${account}/${repository.name}.`;
+                status.append(saved);
+
+                const panel = $("#publish-panel");
+                panel.classList.remove("hidden");
+                $("#publish-title").textContent = "Publishing your portfolio";
+                $("#publish-detail").textContent = "Your changes are saved. Waiting for GitHub Pages to build the website…";
+                $("#publish-actions-link").href = `https://github.com/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/actions`;
+                $("#publish-actions-link").hidden = false;
+                $("#visit-portfolio-link").hidden = true;
+                $("#copy-portfolio-link").hidden = true;
+                $("#copy-portfolio-link").textContent = "Copy link";
+                $("#refresh-publish-status").hidden = true;
+                setPublishStep("#publish-commit-step", "done");
+                setPublishStep("#publish-build-step", "current");
+                setPublishStep("#publish-live-step", "pending");
+
+                const nextStep = document.createElement("div");
+                nextStep.className = "pages-next-step";
+                nextStep.id = "pages-setup-instructions";
+                const heading = document.createElement("strong");
+                heading.textContent = "If you have not turned on your website yet";
+                const note = document.createElement("p");
+                note.textContent = "Open Pages settings, choose Deploy from a branch, select the default branch and /(root), then Save. Come back here and we’ll check the build.";
+                const instructions = document.createElement("ol");
+                for (const text of [
+                    "Choose “Deploy from a branch”.",
+                    `Choose “${repository.default_branch || "main"}” and “/(root)”.`,
+                    "Press Save, then return here. Your site link will appear when the build finishes."
+                ]) {
+                    const item = document.createElement("li");
+                    item.textContent = text;
+                    instructions.append(item);
+                }
+                const link = document.createElement("a");
+                link.className = "button secondary";
+                link.href = `https://github.com/${encodeURIComponent(account)}/${encodeURIComponent(repository.name)}/settings/pages`;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "Open Pages settings";
+                nextStep.append(heading, note, instructions, link);
+                status.append(nextStep);
+
+                if (commitSha) {
+                    const generation = ++publishCheckGeneration;
+                    checkPagesDeployment(commitSha, 0, generation);
+                } else {
+                    showPublishRetry("Your changes were saved, but GitHub did not return a commit ID, so the build cannot be tracked here. Open Actions on GitHub to check.", "Build status unavailable");
+                }
             }
 
             async function savePortfolio() {
@@ -1581,6 +1955,7 @@
                         ].reduce((total, image) => total + image.length, 0);
                         throw new Error(`This portfolio is still too large for GitHub (${Math.ceil(content.length / 1024)} KB; limit 900 KB). Uploaded images are optimized automatically; remove some images or use fewer/smaller pictures. Images account for about ${Math.ceil(mediaChars / 1024)} KB.`);
                     }
+                    await ensureEmojiAssets(config);
                     const payload = {
                         message: managedPortfolio ? "Update portfolio with Portfolio Studio" : "Create portfolio with Portfolio Studio",
                         content: utf8ToBase64(content),
@@ -1593,14 +1968,7 @@
                     });
                     existingSha = saved.content.sha;
                     managedPortfolio = true;
-                    let pagesNotice = "";
-                    try {
-                        pagesNotice = await enablePagesIfRequested();
-                    } catch (error) {
-                        showStatus($("#save-status"), `The portfolio was saved, but GitHub Pages setup failed: ${error.message} You can enable Pages manually in repository settings.`, "error");
-                        return;
-                    }
-                    showStatus($("#save-status"), `Portfolio saved to ${account}/${repository.name}/index.html.${pagesNotice} You can revoke the token now in GitHub PAT settings.`, "ok");
+                    showPortfolioSaved(saved.commit?.sha || "");
                 } catch (error) {
                     showStatus($("#save-status"), `Could not complete publishing: ${error.message}`, "error");
                 } finally {
@@ -1612,9 +1980,13 @@
             document.querySelectorAll("[data-mode]").forEach((button) => {
                 button.addEventListener("click", () => {
                     mode = button.dataset.mode;
+                    const repositoryStep = $("#repository-setup-step");
+                    repositoryStep.classList.toggle("hidden", mode === "edit");
+                    $("#token-step-number").textContent = mode === "edit" ? "1" : "2";
+                    $("#repository-step-number").textContent = mode === "edit" ? "2" : "3";
                     $("#connect-intro").textContent = mode === "new"
-                        ? "Create a new portfolio in an empty repository on your own GitHub account."
-                        : "Choose the repository that contains a Portfolio Studio page. Unrecognized or altered HTML will be rejected rather than overwritten.";
+                        ? "Do these small steps, then enter your repository name and token below."
+                        : "Use the repository you already made, then enter its name and a temporary token below.";
                     $("#repository").value = "";
                     $("#pat").value = "";
                     $("#terms-accept").checked = false;
@@ -1722,26 +2094,62 @@
                 if (action) handleAction(action);
             });
             const openSaveDialog = () => {
+                clearTimeout(publishCheckTimer);
+                publishCheckTimer = null;
+                publishCheckGeneration++;
+                currentPublishCommitSha = "";
                 $("#save-status").textContent = "";
+                $("#publish-panel").classList.add("hidden");
                 $("#confirm-save").disabled = false;
+                $("#publish-target").textContent = `${account}/${repository.name}`;
                 saveDialog.showModal();
             };
             $("#save-button").addEventListener("click", openSaveDialog);
             $("#editor-save-button").addEventListener("click", openSaveDialog);
             $("#cancel-save").addEventListener("click", () => saveDialog.close());
             $("#confirm-save").addEventListener("click", savePortfolio);
+            saveDialog.addEventListener("close", () => {
+                clearTimeout(publishCheckTimer);
+                publishCheckTimer = null;
+                publishCheckGeneration++;
+            });
+            $("#refresh-publish-status").addEventListener("click", () => {
+                if (!currentPublishCommitSha) return;
+                const generation = ++publishCheckGeneration;
+                $("#publish-title").textContent = "Checking the GitHub build";
+                $("#publish-detail").textContent = "Looking for the build for your latest changes…";
+                $("#refresh-publish-status").hidden = true;
+                setPublishStep("#publish-build-step", "current");
+                checkPagesDeployment(currentPublishCommitSha, 0, generation);
+            });
+            $("#copy-portfolio-link").addEventListener("click", async () => {
+                const url = $("#visit-portfolio-link").href;
+                try {
+                    await navigator.clipboard.writeText(url);
+                    $("#copy-portfolio-link").textContent = "Copied!";
+                } catch {
+                    window.prompt("Copy your portfolio link:", url);
+                }
+            });
 
             window.setInterval(updatePreviewClocks, 1000);
 
             window.addEventListener("pagehide", () => {
                 token = "";
                 $("#pat").value = "";
+                clearTimeout(publishCheckTimer);
             });
 
             loadBadgeAssets().catch((error) => {
                 const warning = document.createElement("p");
                 warning.className = "warning";
                 warning.textContent = `${error.message} You can still build a portfolio without badges.`;
+                welcomeView.append(warning);
+            });
+            loadEmojiCatalog().catch((error) => {
+                const warning = document.createElement("p");
+                warning.className = "warning";
+                warning.textContent = `${error.message} Custom inline emoji insertion is unavailable until the list is fixed.`;
                 welcomeView.append(warning);
             });
         })();

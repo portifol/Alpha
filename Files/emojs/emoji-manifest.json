@@ -1,0 +1,32 @@
+[
+  {
+    "name": "female_symbol",
+    "label": "Female symbol",
+    "path": "Files/emojs/FemaleSighn.svg"
+  },
+  {
+    "name": "male_symbol",
+    "label": "Male symbol",
+    "path": "Files/emojs/MaleSighn.svg"
+  },
+  {
+    "name": "time",
+    "label": "Time",
+    "path": "Files/emojs/Time.svg"
+  },
+  {
+    "name": "magnifying_glass",
+    "label": "Magnifying glass",
+    "path": "Files/emojs/MagnifyingGlass.svg"
+  },
+  {
+    "name": "redacted",
+    "label": "Redacted",
+    "path": "Files/emojs/Redacted.svg"
+  },
+  {
+    "name": "yanflare_green_key",
+    "label": "Yanflare green key",
+    "path": "Files/emojs/Yanflare_GreenKey.png"
+  }
+]
