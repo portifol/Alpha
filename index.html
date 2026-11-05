@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#ff85a2">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23ff85a2'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='42' fill='white'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
-    <title>Portfolio Studio</title>
+    <title>portifol Studio</title>
     <style>
         :root {
             color-scheme: light;
@@ -298,7 +298,7 @@
         <header class="topbar">
             <div class="brand">
                 <div class="brand-mark" aria-hidden="true">✦</div>
-                <div><h1>Portfolio Studio</h1><p>A guided editor for your personal page</p></div>
+                <div><h1>portifol Studio</h1><p>A guided editor for your personal page</p></div>
             </div>
         </header>
 
@@ -713,7 +713,7 @@
                         }
                         const results = await Promise.all(BADGES.map(async (badge) => {
                             const response = await fetch(badge.path);
-                            if (!response.ok) throw new Error(`Could not load the badge gallery (${badge.path}). Open Portfolio Studio from its hosted site and reload.`);
+                            if (!response.ok) throw new Error(`Could not load the badge gallery (${badge.path}). Open portifol Studio from its hosted site and reload.`);
                             const blob = await response.blob();
                             const data = await new Promise((resolve, reject) => {
                                 const reader = new FileReader();
@@ -737,7 +737,7 @@
                 if (!emojiCatalogLoad) {
                     emojiCatalogLoad = (async () => {
                         if (window.location.protocol === "file:") {
-                            throw new Error("Custom emoji previews need Portfolio Studio served over HTTP or HTTPS.");
+                            throw new Error("Custom emoji previews need portifol Studio served over HTTP or HTTPS.");
                         }
                         const response = await fetch(EMOJI_MANIFEST, { cache: "no-cache" });
                         if (!response.ok) throw new Error(`Could not load the custom emoji list (${EMOJI_MANIFEST}).`);
@@ -1537,7 +1537,7 @@
 
             function parseManagedPortfolio(html) {
                 if (!html.includes("<!-- portfolio-studio:managed:v1 -->")) {
-                    throw new Error("This index.html was not created by Portfolio Studio. It may contain unsupported edits, so it was not changed.");
+                    throw new Error("This index.html was not created by portifol Studio. It may contain unsupported edits, so it was not changed.");
                 }
                 const match = html.match(/<script id="portfolio-studio-data" type="application\/json">([\s\S]*?)<\/script>/);
                 if (!match) throw new Error("The portfolio data is missing or damaged; the file may have been altered.");
@@ -1957,7 +1957,7 @@
                     }
                     await ensureEmojiAssets(config);
                     const payload = {
-                        message: managedPortfolio ? "Update portfolio with Portfolio Studio" : "Create portfolio with Portfolio Studio",
+                        message: managedPortfolio ? "Update portfolio with portifol Studio" : "Create portfolio with portifol Studio",
                         content: utf8ToBase64(content),
                         ...(sha ? { sha } : {})
                     };
