@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#ff85a2">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23ff85a2'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='42' fill='white'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+    <link id="studio-favicon" rel="icon" href="Files/Untitled85_20261105221218.png" type="image/png">
     <title>portifol Studio</title>
     <style>
         :root {
@@ -57,8 +57,8 @@
         }
         .brand { display: flex; align-items: center; gap: 12px; }
         .brand-mark {
-            width: 42px; height: 42px; display: grid; place-items: center;
-            border-radius: 14px; background: var(--accent); color: white; font-size: 22px;
+            width: 58px; height: 58px; display: block; flex: 0 0 52px;
+            border-radius: 16px; object-fit: cover;
         }
         h1, h2, h3, p { margin-top: 0; }
         h1 { margin-bottom: 8px; font-size: clamp(1.7rem, 3vw, 2.4rem); }
@@ -297,7 +297,7 @@
     <main class="shell">
         <header class="topbar">
             <div class="brand">
-                <div class="brand-mark" aria-hidden="true">✦</div>
+                <img class="brand-mark" src="Files/Untitled85_20261105221218.png" alt="">
                 <div><h1>portifol Studio</h1><p>Flair's Community</p></div>
             </div>
         </header>
@@ -459,6 +459,7 @@
             ];
             const DEFAULTS = {
                 accent: "#ff85a2",
+                icon: "",
                 profile: { type: "carousel", alignment: "center", images: [], banner: { data: "", alt: "", positionY: 45 } },
                 name: "",
                 status: "",
@@ -546,6 +547,7 @@
             const preview = $("#portfolio-preview");
             const editorPreview = $("#editor-preview");
             const wizardPreviewFrame = $("#wizard-preview-frame");
+            const defaultStudioFavicon = $("#studio-favicon").href;
             const consentDialog = $("#consent-dialog");
             const saveDialog = $("#save-dialog");
             const containerDialog = $("#container-dialog");
@@ -631,6 +633,27 @@
                     binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + 0x8000, bytes.length)));
                 }
                 return `data:${mime};base64,${btoa(binary)}`;
+            }
+
+            async function pngFileToDataUri(file) {
+                if (!file || (file.type && file.type !== "image/png")) throw new Error("Choose a PNG image file.");
+                if (file.size > 512 * 1024) throw new Error("The PNG icon must be smaller than 512 KB.");
+                const bytes = new Uint8Array(await file.arrayBuffer());
+                const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+                if (signature.some((byte, index) => bytes[index] !== byte)) {
+                    throw new Error("This file is not a valid PNG image.");
+                }
+                let bitmap;
+                try {
+                    bitmap = await createImageBitmap(file);
+                } catch {
+                    throw new Error("This PNG could not be opened. Try a different PNG image.");
+                }
+                try {
+                    return dataUriFromBytes(bytes, "image/png");
+                } finally {
+                    bitmap.close();
+                }
             }
 
             function utf8ToBase64(text) {
@@ -1184,7 +1207,13 @@
 
             function generatedPortfolio(data) {
                 const json = JSON.stringify(data).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
-                return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="theme-color" content="${escapeHtml(data.accent)}">\n<title>${escapeHtml(data.name || "Personal portfolio")}</title>\n<meta name="portfolio-studio-format" content="1">\n<style>${PORTFOLIO_CSS}</style>\n</head>\n<body>\n<!-- portfolio-studio:managed:v1 -->\n${portfolioMarkup(data)}\n                                \x3cscript id="portfolio-studio-data" type="application/json">${json}<\/script>\n\x3cscript>\n                                                (()=>{const root=document.querySelector(".portfolio-page");if(!root)return;for(const node of root.querySelectorAll("[data-date]")){const date=new Date(node.dataset.date+"T00:00:00");const today=new Date();const days=Math.abs(Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())-Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))/86400000));node.dataset.hint=days===0?"Today":days>=365?Math.floor(days/365.2425)+" years":days>=30?Math.floor(days/30.4375)+" months":days+" days";}const dataNode=document.getElementById("portfolio-studio-data");const data=dataNode?JSON.parse(dataNode.textContent):null;const photos=root.querySelector(".portfolio-photos.carousel");if(photos&&data&&data.profile.images.length>1){const images=data.profile.images.filter(image=>image.data&&image.data.startsWith("data:image/"));const slots=[...photos.querySelectorAll("img")];let current=0,busy=false;const assign=(node,index)=>{const image=images[(index+images.length)%images.length];node.src=image.data;node.alt=image.alt||"Profile picture";};assign(slots[0],images.length-1);assign(slots[1],0);assign(slots[2],1);assign(slots[3],2);const rotate=direction=>{if(busy)return;busy=true;const [left,center,right,incoming]=slots;assign(incoming,current+direction*2);photos.classList.add("is-animating");incoming.style.left=direction>0?"100%":"-33.333%";const shift=direction>0?"-100%":"100%";const animations=[[left,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:0}]],[center,[{transform:"translateX(0) scale(1)",opacity:1},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]],[right,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(1)",opacity:1}]],[incoming,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]]];Promise.all(animations.map(([node,keyframes])=>node.animate(keyframes,{duration:380,easing:"ease-in-out",fill:"forwards"}).finished)).then(()=>{current=(current+direction+images.length)%images.length;const next=direction>0?[center,right,incoming,left]:[incoming,left,center,right];slots.splice(0,4,...next);slots.forEach((node,index)=>{node.className="pfp-"+["left","center","right","incoming"][index];node.style.left="";node.style.transform="";node.style.opacity="";});assign(slots[3],current+2);photos.classList.remove("is-animating");busy=false;}).catch(()=>{photos.classList.remove("is-animating");busy=false;});};let startX=0;photos.addEventListener("wheel",event=>{event.preventDefault();rotate(event.deltaY>=0?1:-1);},{passive:false});photos.addEventListener("pointerdown",event=>{startX=event.clientX;photos.setPointerCapture(event.pointerId);});photos.addEventListener("pointerup",event=>{const distance=event.clientX-startX;if(Math.abs(distance)>24)rotate(distance<0?1:-1);});photos.addEventListener("keydown",event=>{if(event.key==="ArrowRight")rotate(1);if(event.key==="ArrowLeft")rotate(-1);});photos.tabIndex=0;}for(const clock of root.querySelectorAll("[data-clock]")){const zone=clock.dataset.clock;const digital=clock.querySelector(".hybrid-digital");const display=root.querySelector("[data-timezone]");const update=()=>{try{const parts=new Intl.DateTimeFormat("en-GB",{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const values=Object.fromEntries(parts.map(part=>[part.type,part.value]));const hour=Number(values.hour),minute=Number(values.minute),second=Number(values.second);if(display)display.textContent=hour+":"+values.minute+":"+values.second;if(digital)digital.textContent=hour+":"+values.minute;clock.querySelector(".h-hour").style.transform="rotate("+(hour%12*30+minute*.5-90)+"deg)";clock.querySelector(".h-min").style.transform="rotate("+(minute*6-90)+"deg)";clock.querySelector(".h-sec").style.transform="rotate("+(second*6-90)+"deg)";}catch{if(display)display.textContent="Invalid timezone";}};update();setInterval(update,1000);}})();\n                <\/script>\n\x3c/body>\n\x3c/html>\n`;
+                return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="theme-color" content="${escapeHtml(data.accent)}">\n${typeof data.icon === "string" && data.icon.startsWith("data:image/png;base64,") ? `<link rel="icon" type="image/png" href="${escapeHtml(data.icon)}">\n` : ""}<title>${escapeHtml(data.name || "Personal portfolio")}</title>\n<meta name="portfolio-studio-format" content="1">\n<style>${PORTFOLIO_CSS}</style>\n</head>\n<body>\n<!-- portfolio-studio:managed:v1 -->\n${portfolioMarkup(data)}\n                                \x3cscript id="portfolio-studio-data" type="application/json">${json}<\/script>\n\x3cscript>\n                                                (()=>{const root=document.querySelector(".portfolio-page");if(!root)return;for(const node of root.querySelectorAll("[data-date]")){const date=new Date(node.dataset.date+"T00:00:00");const today=new Date();const days=Math.abs(Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())-Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))/86400000));node.dataset.hint=days===0?"Today":days>=365?Math.floor(days/365.2425)+" years":days>=30?Math.floor(days/30.4375)+" months":days+" days";}const dataNode=document.getElementById("portfolio-studio-data");const data=dataNode?JSON.parse(dataNode.textContent):null;const photos=root.querySelector(".portfolio-photos.carousel");if(photos&&data&&data.profile.images.length>1){const images=data.profile.images.filter(image=>image.data&&image.data.startsWith("data:image/"));const slots=[...photos.querySelectorAll("img")];let current=0,busy=false;const assign=(node,index)=>{const image=images[(index+images.length)%images.length];node.src=image.data;node.alt=image.alt||"Profile picture";};assign(slots[0],images.length-1);assign(slots[1],0);assign(slots[2],1);assign(slots[3],2);const rotate=direction=>{if(busy)return;busy=true;const [left,center,right,incoming]=slots;assign(incoming,current+direction*2);photos.classList.add("is-animating");incoming.style.left=direction>0?"100%":"-33.333%";const shift=direction>0?"-100%":"100%";const animations=[[left,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:0}]],[center,[{transform:"translateX(0) scale(1)",opacity:1},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]],[right,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(1)",opacity:1}]],[incoming,[{transform:"translateX(0) scale(.75)",opacity:.5},{transform:"translateX("+shift+") scale(.75)",opacity:.5}]]];Promise.all(animations.map(([node,keyframes])=>node.animate(keyframes,{duration:380,easing:"ease-in-out",fill:"forwards"}).finished)).then(()=>{current=(current+direction+images.length)%images.length;const next=direction>0?[center,right,incoming,left]:[incoming,left,center,right];slots.splice(0,4,...next);slots.forEach((node,index)=>{node.className="pfp-"+["left","center","right","incoming"][index];node.style.left="";node.style.transform="";node.style.opacity="";});assign(slots[3],current+2);photos.classList.remove("is-animating");busy=false;}).catch(()=>{photos.classList.remove("is-animating");busy=false;});};let startX=0;photos.addEventListener("wheel",event=>{event.preventDefault();rotate(event.deltaY>=0?1:-1);},{passive:false});photos.addEventListener("pointerdown",event=>{startX=event.clientX;photos.setPointerCapture(event.pointerId);});photos.addEventListener("pointerup",event=>{const distance=event.clientX-startX;if(Math.abs(distance)>24)rotate(distance<0?1:-1);});photos.addEventListener("keydown",event=>{if(event.key==="ArrowRight")rotate(1);if(event.key==="ArrowLeft")rotate(-1);});photos.tabIndex=0;}for(const clock of root.querySelectorAll("[data-clock]")){const zone=clock.dataset.clock;const digital=clock.querySelector(".hybrid-digital");const display=root.querySelector("[data-timezone]");const update=()=>{try{const parts=new Intl.DateTimeFormat("en-GB",{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const values=Object.fromEntries(parts.map(part=>[part.type,part.value]));const hour=Number(values.hour),minute=Number(values.minute),second=Number(values.second);if(display)display.textContent=hour+":"+values.minute+":"+values.second;if(digital)digital.textContent=hour+":"+values.minute;clock.querySelector(".h-hour").style.transform="rotate("+(hour%12*30+minute*.5-90)+"deg)";clock.querySelector(".h-min").style.transform="rotate("+(minute*6-90)+"deg)";clock.querySelector(".h-sec").style.transform="rotate("+(second*6-90)+"deg)";}catch{if(display)display.textContent="Invalid timezone";}};update();setInterval(update,1000);}})();\n                <\/script>\n\x3c/body>\n\x3c/html>\n`;
+            }
+
+            function updateStudioFavicon() {
+                $("#studio-favicon").href = typeof config.icon === "string" && config.icon.startsWith("data:image/png;base64,")
+                    ? config.icon
+                    : defaultStudioFavicon;
             }
 
             function renderPreview() {
@@ -1203,6 +1232,7 @@
                     initializePreviewBehavior(editorPreview.querySelector(".portfolio-page"));
                 }
                 updatePreviewClocks();
+                updateStudioFavicon();
             }
 
             function renderStepIndicator() {
@@ -1231,7 +1261,9 @@
                 let body = "";
                 if (step.id === "accent") {
                     const accent = /^#[0-9a-f]{6}$/i.test(config.accent) ? config.accent : DEFAULTS.accent;
-                    body = `<div class="field"><label for="accent-input">Your favourite colour</label><div class="row"><input id="accent-input" type="color" data-field="accent" value="${accent}"><input aria-label="Accent colour hex value" data-field="accent" value="${accent}" pattern="#[0-9a-fA-F]{6}" maxlength="7"></div><span class="small">The preview's accents update immediately.</span></div>`;
+                    body = `<div class="field"><label for="accent-input">Your favourite colour</label><div class="row"><input id="accent-input" type="color" data-field="accent" value="${accent}"><input aria-label="Accent colour hex value" data-field="accent" value="${accent}" pattern="#[0-9a-fA-F]{6}" maxlength="7"></div><span class="small">The preview's accents update immediately.</span></div>
+                        <div class="field"><label for="site-icon-upload">Portfolio tab icon (optional)</label><input id="site-icon-upload" type="file" accept=".png,image/png"><span class="small">Choose a valid PNG file, up to 512 KB. It will appear in the browser tab and be included in your published portfolio.</span></div>
+                        ${typeof config.icon === "string" && config.icon.startsWith("data:image/png;base64,") ? `<div class="form-card"><div class="form-card-head"><strong>Icon preview</strong><button class="danger" type="button" data-action="remove-icon">Remove icon</button></div><img src="${escapeHtml(config.icon)}" alt="Portfolio icon preview" style="display:block;width:64px;height:64px;object-fit:contain;margin-top:10px"></div>` : ""}`;
                 } else if (step.id === "profile") {
                     const banner = config.profile.banner;
                     body = `<div class="field"><label for="profile-banner-upload">Profile banner (optional)</label><input id="profile-banner-upload" type="file" accept="image/*"><span class="small">A wide image displayed above and behind your profile pictures, like the example. Images are optimized and embedded in the portfolio.</span></div>
@@ -1357,6 +1389,7 @@
             }
 
             function renderEditor() {
+                updateStudioFavicon();
                 $("#editor-repository").textContent = repository ? `${account}/${repository.name}` : "Not connected";
                 const rows = [
                     `<div class="editor-item"><span class="drag-handle" aria-hidden="true">▦</span><span class="item-name"><strong>Main profile</strong><br><span class="small">Name, photos, stats, badges, bio, and social links</span></span><button class="secondary" type="button" data-editor-action="profile">Edit details</button></div>`
@@ -1446,7 +1479,9 @@
 
             async function handleUpload(input) {
                 try {
-                    if (input.id === "profile-upload") {
+                    if (input.id === "site-icon-upload" && input.files[0]) {
+                        config.icon = await pngFileToDataUri(input.files[0]);
+                    } else if (input.id === "profile-upload") {
                         for (const file of Array.from(input.files || [])) {
                             if (config.profile.type === "default" && config.profile.images.length) break;
                             config.profile.images.push({ data: await fileToDataUri(file), alt: file.name.replace(/\.[^.]+$/, "") });
@@ -1511,6 +1546,7 @@
                 if (action === "move-extra") swapItems(config.extras, index, Number(button.dataset.direction));
                 if (action === "remove-image") config.profile.images.splice(index, 1);
                 if (action === "remove-banner") config.profile.banner = { ...DEFAULTS.profile.banner };
+                if (action === "remove-icon") config.icon = "";
                 if (action === "add-bio-break") config.bio += "\n";
                 renderWizard();
             }
@@ -1947,13 +1983,14 @@
                     const content = normalizeGeneratedPortfolio(generatedPortfolio(config));
                     if (content.length > 900000) {
                         const mediaChars = [
+                            config.icon || "",
                             ...config.profile.images.map((image) => image.data),
                             config.profile.banner.data || "",
                             ...config.socials.map((social) => social.iconData || ""),
                             ...config.interests.items.map((item) => item.image || ""),
                             ...config.extras.map((item) => item.image || "")
                         ].reduce((total, image) => total + image.length, 0);
-                        throw new Error(`This portfolio is still too large for GitHub (${Math.ceil(content.length / 1024)} KB; limit 900 KB). Uploaded images are optimized automatically; remove some images or use fewer/smaller pictures. Images account for about ${Math.ceil(mediaChars / 1024)} KB.`);
+                        throw new Error(`This portfolio is still too large for GitHub (${Math.ceil(content.length / 1024)} KB; limit 900 KB). Remove some images or use fewer/smaller pictures. Images account for about ${Math.ceil(mediaChars / 1024)} KB.`);
                     }
                     await ensureEmojiAssets(config);
                     const payload = {
