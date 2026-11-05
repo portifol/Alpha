@@ -88,13 +88,46 @@
         .success { background: #edf9f1; border: 1px solid #b9e2c4; color: #245c34; }
         .small { color: var(--muted); font-size: .88rem; line-height: 1.5; }
         .steps-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr); gap: 24px; align-items: start; }
+        .steps-layout.preview-hidden { grid-template-columns: minmax(0, 820px); justify-content: center; }
+        .steps-layout.preview-hidden .preview-sticky { display: none; }
         .wizard-panel { min-width: 0; }
-        .step-heading { margin-bottom: 20px; }
+        .step-heading { margin-bottom: 28px; animation: quiz-enter .35s cubic-bezier(.2,.8,.2,1) both; }
+        .step-heading h1 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.035em; }
         .step-heading p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
-        .step-indicator { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
-        .step-dot { border: 0; padding: 7px 10px; background: #f1ecef; border-radius: 99px; font-size: .78rem; color: var(--muted); }
-        .step-dot.active { background: var(--accent-soft); color: #6a293e; font-weight: 800; }
+        @keyframes quiz-enter { from { opacity: 0; transform: translateY(12px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .step-indicator { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+        .step-dot { border: 0; padding: 8px 13px; background: #f1ecef; border-radius: 99px; font-size: .82rem; color: var(--muted); transition: background .2s, color .2s, transform .2s; }
+        .step-dot:hover { transform: translateY(-2px); }
+        .step-dot.active { background: var(--accent-soft); color: #6a293e; font-weight: 800; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent); }
         .step-dot.complete { color: #563545; }
+        .wizard-question { animation: quiz-enter .4s cubic-bezier(.2,.8,.2,1) both; }
+        .wizard-question > .field:first-child { margin-top: 0; }
+        .quiz-color { display: grid; justify-items: center; gap: 22px; margin: 32px 0 38px; }
+        .quiz-color-control { position: relative; display: block; width: clamp(180px, 42vw, 260px); height: clamp(180px, 42vw, 260px); cursor: pointer; }
+        .quiz-color-swatch { display: block; width: clamp(180px, 42vw, 260px); height: clamp(180px, 42vw, 260px); padding: 0; border: 8px solid white; border-radius: 50%; background: var(--quiz-color); box-shadow: 0 12px 35px color-mix(in srgb, var(--quiz-color) 38%, transparent), 0 0 0 1px #0001; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+        .quiz-color-control:hover .quiz-color-swatch { transform: scale(1.035) rotate(-2deg); }
+        .quiz-color-control:focus-within .quiz-color-swatch { outline: 3px solid #6c3e4d; outline-offset: 4px; }
+        .quiz-hex { width: 150px !important; padding: 6px 10px !important; border: 1px solid transparent !important; border-radius: 8px !important; background: transparent !important; font-size: 1.15rem; font-weight: 750; text-align: center; text-transform: uppercase; }
+        .quiz-hex:focus { border-color: var(--line) !important; background: white !important; }
+        .quiz-optional-icon { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+        .quiz-optional-icon summary { color: var(--muted); cursor: pointer; font-size: .88rem; }
+        .quiz-optional-icon .field { margin-bottom: 0; }
+        .quiz-profile { display: grid; justify-items: center; gap: 22px; margin: 26px auto 10px; text-align: center; }
+        .quiz-picture-stage { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 208px; }
+        .quiz-picture { display: grid; flex: 0 0 auto; place-items: center; width: 184px; height: 184px; overflow: hidden; border: 6px solid white; border-radius: 50%; background: var(--accent-soft); color: #9c3d5a; box-shadow: 0 8px 25px #45213722; font-size: 3.5rem; transition: transform .25s, opacity .25s; }
+        .quiz-picture img { width: 100%; height: 100%; object-fit: cover; }
+        .quiz-picture.secondary { width: 128px; height: 128px; opacity: .58; transform: scale(.86); }
+        .quiz-profile[data-type="default"] .quiz-picture.secondary { display: none; }
+        .quiz-upload { padding: 12px 18px; border-radius: 99px; }
+        .quiz-controls { display: grid; gap: 14px; width: min(100%, 430px); }
+        .quiz-control-label { margin: 0; color: var(--muted); font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+        .segmented-control { display: flex; gap: 5px; padding: 5px; border-radius: 14px; background: #f3eef1; }
+        .segmented-option { flex: 1; min-height: 42px; padding: 9px 12px; border-radius: 10px; background: transparent; color: var(--muted); transition: background .2s, color .2s, box-shadow .2s, transform .2s; }
+        .segmented-option[aria-pressed="true"] { background: white; color: var(--ink); box-shadow: 0 2px 8px #45213718; }
+        .segmented-option:hover { transform: translateY(-1px); }
+        .quiz-banner-sample { width: 100%; aspect-ratio: 2.8 / 1; display: grid; place-items: center; overflow: hidden; border-radius: 16px; background: linear-gradient(135deg, var(--accent-soft), #f5d6e0 55%, #e8c1d0); color: #8d5368; font-size: 1.1rem; font-weight: 700; }
+        .quiz-banner-sample img { width: 100%; height: 100%; object-fit: cover; }
+        .quiz-next-note { margin: 8px 0 0; color: var(--muted); font-size: .88rem; text-align: center; }
         .field { display: grid; gap: 7px; margin: 15px 0; }
         .field > label, .field-label { font-weight: 700; font-size: .93rem; }
         input:not([type=checkbox]):not([type=radio]), select, textarea {
@@ -103,6 +136,10 @@
         }
         textarea { resize: vertical; min-height: 100px; }
         input[type=color] { width: 72px; height: 44px; padding: 3px; border: 1px solid var(--line); border-radius: 8px; }
+        .quiz-color-control input[type=color] { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+        .wizard-panel input.quiz-hex { width: 150px; padding: 6px 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; }
+        .wizard-panel .quiz-upload { position: relative; }
+        .wizard-panel .quiz-upload input[type=file] { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; }
         input[type=checkbox], input[type=radio] { accent-color: var(--accent); width: 18px; height: 18px; vertical-align: middle; }
         .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -120,6 +157,7 @@
         .emoji-row button { padding: 5px 8px; background: #f0e9ed; color: var(--ink); font-size: .83rem; }
         .wizard-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
         .wizard-actions .right { display: flex; gap: 9px; }
+        .wizard-actions button { min-width: 105px; }
         .preview-sticky { position: sticky; top: 18px; }
         .preview-title { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
         .preview-title h2 { margin: 0; }
@@ -184,6 +222,15 @@
         .publish-step[data-state="done"] .publish-step-icon { border-color: #28723c; }
         .publish-step[data-state="current"] .publish-step-icon { border-color: #bd7b12; border-right-color: transparent; color: #bd7b12; animation: publish-spin .8s linear infinite; }
         @keyframes publish-spin { to { transform: rotate(360deg); } }
+        #publish-build-step { flex-wrap: wrap; }
+        .publish-build-progress { flex: 1 0 calc(100% - 34px); display: grid; gap: 8px; margin: 12px 0 2px 31px; padding: 0; list-style: none; font-size: .88rem; }
+        .publish-build-job { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 4px 10px; align-items: baseline; color: var(--muted); }
+        .publish-build-job-name { color: var(--ink); font-weight: 700; }
+        .publish-build-job[data-state="current"] .publish-build-job-name { color: #9a620c; }
+        .publish-build-job[data-state="error"] .publish-build-job-name { color: #a22d45; }
+        .publish-build-job-steps { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px 12px; margin: 0 0 2px; padding: 0; list-style: none; font-size: .78rem; }
+        .publish-build-job-steps li[data-state="current"] { color: #9a620c; font-weight: 700; }
+        .publish-build-job-steps li[data-state="error"] { color: #a22d45; }
         .publish-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .publish-actions .button, .publish-actions button { min-height: 40px; }
         .publish-actions a[hidden], .publish-actions button[hidden] { display: none; }
@@ -288,8 +335,15 @@
         @media (max-width: 560px) {
             .shell { padding: 18px 12px 82px; }
             .choice-grid, .field-row { grid-template-columns: 1fr; }
+            .quiz-picture { width: 156px; height: 156px; }
+            .quiz-picture.secondary { width: 100px; height: 100px; }
+            .quiz-picture-stage { min-height: 170px; }
+            .wizard-actions button { min-width: 0; }
             .portfolio-stats { grid-template-columns: 1fr; }
             .topbar { margin-bottom: 18px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
         }
     </style>
 </head>
@@ -414,7 +468,7 @@
             <h3 id="publish-title">Publishing your portfolio</h3>
             <ol class="publish-steps">
                 <li id="publish-commit-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Save your changes to GitHub</span></li>
-                <li id="publish-build-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Build your website</span></li>
+                <li id="publish-build-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Build your website</span><ol id="publish-build-progress" class="publish-build-progress" aria-label="Build progress" hidden></ol></li>
                 <li id="publish-live-step" class="publish-step" data-state="pending"><span class="publish-step-icon" aria-hidden="true"></span><span>Your portfolio is live</span></li>
             </ol>
             <p id="publish-detail" class="status" role="status" aria-live="polite"></p>
@@ -447,15 +501,18 @@
                 { name: "Hollow Knight", path: "Files/Badges/HS.svg" }
             ];
             const STEPS = [
-                { id: "accent", title: "Accent colour", description: "Choose a favourite colour. It changes the portfolio's buttons, highlights, and section accents." },
-                { id: "profile", title: "Profile images", description: "Add an optional wide banner and one picture or a small carousel. Images are embedded in the portfolio when you publish." },
-                { id: "identity", title: "Identity and stats", description: "Choose your display name and add any stat bars you like. The examples are suggestions, not requirements. Date stats show an age/distance hint on hover." },
-                { id: "badges", title: "Badges", description: "Choose any of the included badges to show under your stats. You can skip all of them." },
-                { id: "bio", title: "About you", description: "Write the short bio shown in the profile card. Use the custom emoji picker to insert icons from Files/emojs." },
-                { id: "socials", title: "Social links", description: "Optional links to your profiles. Only secure https:// links are published. Custom icon URLs are optional." },
-                { id: "timezone", title: "Timezone", description: "Optional. Add a live local clock. Confirm that the displayed time matches your current time in the selected timezone." },
-                { id: "interests", title: "Interests", description: "Optional vertical image cards, grouped by categories such as Games I own, Hobbies, or Communities." },
-                { id: "extras", title: "Extra containers", description: "Add simple text, links, or images below the main profile. Remove or reorder them with the controls." }
+                { id: "accent", category: "Look", title: "What’s your favourite colour?", description: "Pick the colour for buttons and little highlights on your page." },
+                { id: "profile-picture", category: "Profile & images", title: "Let’s pick your profile picture", description: "Add one picture, or a few for a carousel. You can always change these later.", hidePreview: true },
+                { id: "profile-banner", category: "Profile & images", title: "Want to add a banner?", description: "A wide picture sits behind your profile picture. This one’s totally optional." },
+                { id: "identity-name", category: "About you", title: "What should people call you?", description: "Add a name for your page. You can leave it blank or change it whenever you like." },
+                { id: "identity-status", category: "About you", title: "Want to add a little status?", description: "Add a short line under your name, or leave it blank." },
+                { id: "identity-stats", category: "About you", title: "Anything else you want to share?", description: "Add stat bars like pronouns, birthday, or whatever feels right." },
+                { id: "badges", category: "About you", title: "Want to show any badges?", description: "Pick any that feel like you, or skip this one." },
+                { id: "bio", category: "About you", title: "What do you want people to know?", description: "Write a little about yourself. This is optional, and you can keep it short." },
+                { id: "socials", category: "Extras", title: "Where can people find you?", description: "Add any social links you want to share. Only links you add will appear." },
+                { id: "timezone", category: "Extras", title: "Show your local time?", description: "Add a live clock to your page if you want to." },
+                { id: "interests", category: "Extras", title: "What are you into?", description: "Add interest cards for games, hobbies, communities, or anything else." },
+                { id: "extras", category: "Extras", title: "Anything else for your page?", description: "Add extra text, a link button, or an image. You can skip this too." }
             ];
             const DEFAULTS = {
                 accent: "#ff85a2",
@@ -1236,10 +1293,15 @@
             }
 
             function renderStepIndicator() {
-                $("#step-indicator").innerHTML = STEPS.map((step, index) =>
-                    `<button class="step-dot${index === stepIndex ? " active" : ""}${index < stepIndex ? " complete" : ""}" type="button" data-step-index="${index}" aria-current="${index === stepIndex ? "step" : "false"}">${index + 1}. ${escapeHtml(step.title)}</button>`
-                ).join("");
-                const focus = ["accent", "profile", "identity", "badges", "bio", "socials", "timezone", "interests", "extras"][stepIndex];
+                const categories = [...new Set(STEPS.map((step) => step.category))];
+                const step = STEPS[stepIndex];
+                $("#step-indicator").innerHTML = categories.map((category, index) => {
+                    const firstStep = STEPS.findIndex((item) => item.category === category);
+                    const current = category === step.category;
+                    const complete = index < categories.indexOf(step.category);
+                    return `<button class="step-dot${current ? " active" : ""}${complete ? " complete" : ""}" type="button" data-step-index="${firstStep}" aria-current="${current ? "step" : "false"}">${index + 1}. ${escapeHtml(category)}</button>`;
+                }).join("");
+                const focus = step.id.startsWith("profile-") ? "profile" : step.id.startsWith("identity-") ? "identity" : step.id;
                 if (focus === "accent") delete wizardPreviewFrame.dataset.focus;
                 else wizardPreviewFrame.dataset.focus = focus;
             }
@@ -1255,32 +1317,81 @@
                 ).join("") || `<span class="small">Custom emoji list is loading.</span>`}</div></div>`;
             }
 
+            function updateWizardNextButton() {
+                const next = wizardContent.querySelector('[data-action="next"]');
+                const hex = wizardContent.querySelector("#accent-hex");
+                const invalidAccent = STEPS[stepIndex].id === "accent" && hex && !/^#[0-9a-f]{6}$/i.test(hex.value);
+                if (next && hex) next.disabled = Boolean(invalidAccent);
+                $("#step-indicator").querySelectorAll("[data-step-index]").forEach((button) => {
+                    button.disabled = Boolean(invalidAccent) && Number(button.dataset.stepIndex) !== stepIndex;
+                });
+            }
+
             function renderWizard() {
                 renderStepIndicator();
                 const step = STEPS[stepIndex];
+                document.querySelector(".steps-layout").classList.toggle("preview-hidden", Boolean(step.hidePreview));
                 let body = "";
                 if (step.id === "accent") {
                     const accent = /^#[0-9a-f]{6}$/i.test(config.accent) ? config.accent : DEFAULTS.accent;
-                    body = `<div class="field"><label for="accent-input">Your favourite colour</label><div class="row"><input id="accent-input" type="color" data-field="accent" value="${accent}"><input aria-label="Accent colour hex value" data-field="accent" value="${accent}" pattern="#[0-9a-fA-F]{6}" maxlength="7"></div><span class="small">The preview's accents update immediately.</span></div>
-                        <div class="field"><label for="site-icon-upload">Portfolio tab icon (optional)</label><input id="site-icon-upload" type="file" accept=".png,image/png"><span class="small">Choose a valid PNG file, up to 512 KB. It will appear in the browser tab and be included in your published portfolio.</span></div>
-                        ${typeof config.icon === "string" && config.icon.startsWith("data:image/png;base64,") ? `<div class="form-card"><div class="form-card-head"><strong>Icon preview</strong><button class="danger" type="button" data-action="remove-icon">Remove icon</button></div><img src="${escapeHtml(config.icon)}" alt="Portfolio icon preview" style="display:block;width:64px;height:64px;object-fit:contain;margin-top:10px"></div>` : ""}`;
-                } else if (step.id === "profile") {
+                    body = `<div class="quiz-color">
+                            <label class="quiz-color-control" style="--quiz-color:${accent}" aria-label="Choose your favourite colour">
+                                <input id="accent-input" class="quiz-color-input" type="color" data-field="accent" value="${accent}" aria-label="Choose a colour">
+                                <span class="quiz-color-swatch" aria-hidden="true"></span>
+                            </label>
+                            <input id="accent-hex" class="quiz-hex" aria-label="Colour hex code" data-field="accent" value="${escapeHtml(config.accent)}" pattern="#[0-9a-fA-F]{6}" maxlength="7" spellcheck="false">
+                        </div>
+                        <details class="quiz-optional-icon"><summary>Want to change your tab icon too? (optional)</summary>
+                            <div class="field"><label for="site-icon-upload">Choose a PNG icon</label><input id="site-icon-upload" type="file" accept=".png,image/png"><span class="small">PNG, up to 512 KB.</span></div>
+                            ${typeof config.icon === "string" && config.icon.startsWith("data:image/png;base64,") ? `<div class="form-card"><div class="form-card-head"><strong>Custom tab icon</strong><button class="danger" type="button" data-action="remove-icon">Remove</button></div><img src="${escapeHtml(config.icon)}" alt="Custom tab icon preview" style="display:block;width:40px;height:40px;object-fit:contain;margin-top:8px"></div>` : ""}
+                        </details>`;
+                } else if (step.id === "profile-picture") {
+                    const images = config.profile.images;
+                    const picture = (image, extraClass = "") => `<span class="quiz-picture${extraClass ? ` ${extraClass}` : ""}">${image ? `<img src="${escapeHtml(image.data)}" alt="">` : `<span aria-hidden="true">📷</span>`}</span>`;
+                    const carouselPreview = images.length === 1
+                        ? `${picture(null, "secondary")}${picture(images[0])}${picture(null, "secondary")}`
+                        : `${picture(images[0], "secondary")}${picture(images[1] || null)}${picture(images[2], "secondary")}`;
+                    body = `<div class="quiz-profile" data-type="${escapeHtml(config.profile.type)}">
+                            <div class="quiz-controls">
+                                <p class="quiz-control-label">How should your pictures show?</p>
+                                <div class="segmented-control" role="group" aria-label="Profile picture display style">
+                                    <button class="segmented-option" type="button" data-choice="profile.type" data-value="carousel" aria-pressed="${config.profile.type === "carousel"}">Carousel</button>
+                                    <button class="segmented-option" type="button" data-choice="profile.type" data-value="default" aria-pressed="${config.profile.type === "default"}">Single picture</button>
+                                </div>
+                            </div>
+                            <div class="quiz-picture-stage">${config.profile.type === "carousel" ? carouselPreview : picture(images[0])}</div>
+                            <label class="button quiz-upload" for="profile-upload">${images.length ? "Add or change pictures" : "Choose profile picture"}
+                                <input id="profile-upload" type="file" accept="image/*" multiple>
+                            </label>
+                            <span class="small">Up to 4 MB each. Your picture stays yours; only upload images you can share.</span>
+                            <div class="quiz-controls">
+                                <p class="quiz-control-label">Where should it sit?</p>
+                                <div class="segmented-control" role="group" aria-label="Picture alignment">
+                                    ${["left", "center", "right"].map((item) => `<button class="segmented-option" type="button" data-choice="profile.alignment" data-value="${item}" aria-pressed="${config.profile.alignment === item}">${item[0].toUpperCase()}${item.slice(1)}</button>`).join("")}
+                                </div>
+                            </div>
+                            ${images.length ? `<div class="card-list" style="width:100%;text-align:left">${images.map((image, index) => `<div class="form-card"><div class="form-card-head"><strong>Picture ${index + 1}</strong><button class="danger" type="button" data-action="remove-image" data-index="${index}">Remove</button></div>${arrayInput("profile.images", index, "alt", "Picture description", image.alt || "", "text", true)}</div>`).join("")}</div>` : ""}
+                        </div>`;
+                } else if (step.id === "profile-banner") {
                     const banner = config.profile.banner;
-                    body = `<div class="field"><label for="profile-banner-upload">Profile banner (optional)</label><input id="profile-banner-upload" type="file" accept="image/*"><span class="small">A wide image displayed above and behind your profile pictures, like the example. Images are optimized and embedded in the portfolio.</span></div>
-                        ${banner.data ? `<div class="form-card"><div class="form-card-head"><strong>Banner preview</strong><button class="danger" type="button" data-action="remove-banner">Remove banner</button></div><img src="${escapeHtml(banner.data)}" alt="" style="display:block;width:100%;max-height:180px;object-fit:cover;object-position:center ${clampNumber(banner.positionY, 0, 100, 45)}%;border-radius:10px"><div class="field"><label>Image description</label><input data-field="profile.banner.alt" value="${escapeHtml(banner.alt || "")}" placeholder="Describe the banner for screen readers"></div><div class="field"><label>Vertical crop</label><input type="range" min="0" max="100" data-field="profile.banner.positionY" value="${clampNumber(banner.positionY, 0, 100, 45)}"></div></div>` : ""}
-                        <div class="field"><label for="profile-upload">Upload profile picture${config.profile.type === "carousel" ? "s" : ""}</label><input id="profile-upload" type="file" accept="image/*" multiple><span class="small">Up to 4 MB each. Uploaded pictures are embedded in your published HTML. Avoid images you do not have permission to publish.</span></div>
-                        <div class="field"><label>Display style</label><div class="row"><label><input type="radio" name="profile-type" value="carousel" data-field="profile.type"${config.profile.type === "carousel" ? " checked" : ""}> Carousel</label><label><input type="radio" name="profile-type" value="default" data-field="profile.type"${config.profile.type === "default" ? " checked" : ""}> Single picture</label></div></div>
-                        <div class="field"><label for="profile-align">Alignment</label><select id="profile-align" data-field="profile.alignment">${["left", "center", "right"].map((item) => `<option${config.profile.alignment === item ? " selected" : ""}>${item}</option>`).join("")}</select></div>
-                        <div class="card-list">${config.profile.images.map((image, index) => `<div class="form-card"><div class="form-card-head"><strong>Picture ${index + 1}</strong><button class="danger" type="button" data-action="remove-image" data-index="${index}">Remove</button></div><div class="field-row">${arrayInput("profile.images", index, "alt", "Accessible description", image.alt || "", "text", true)}<div class="field"><label>Preview</label><img src="${escapeHtml(image.data)}" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:50%"></div></div></div>`).join("")}</div>`;
-                } else if (step.id === "identity") {
-                    body = `${field("Display name", "name", config.name, "text", "Your name", true)}${field("Short status (optional)", "status", config.status, "text", "A short line under your name", true)}
-                        <div class="row" style="justify-content:space-between"><h3>Your stat bars</h3><button type="button" data-action="add-stat">+ Add stat</button></div>
-                        <p class="small">A date stat can show a relative age/distance on hover. Prefix is optional text before its value. Leave anything blank to omit it.</p>
+                    body = `<div class="field"><div class="quiz-banner-sample">${banner.data ? `<img src="${escapeHtml(banner.data)}" alt="Banner preview">` : "Your banner will show here"}</div></div>
+                        <div class="field"><label class="button quiz-upload" for="profile-banner-upload">${banner.data ? "Change banner" : "Choose a banner"}
+                            <input id="profile-banner-upload" type="file" accept="image/*">
+                        </label><span class="small">A wide picture behind your profile photo. Up to 4 MB.</span></div>
+                        ${banner.data ? `<div class="form-card"><div class="form-card-head"><strong>Your banner</strong><button class="danger" type="button" data-action="remove-banner">Remove</button></div><div class="field"><label>Picture description</label><input data-field="profile.banner.alt" value="${escapeHtml(banner.alt || "")}" placeholder="Describe the banner for screen readers"></div><div class="field"><label>Move the crop</label><input type="range" min="0" max="100" data-field="profile.banner.positionY" value="${clampNumber(banner.positionY, 0, 100, 45)}"></div></div>` : ""}
+                        <p class="quiz-next-note">No banner? No problem — just skip this one.</p>`;
+                } else if (step.id === "identity-name") {
+                    body = field("Your name", "name", config.name, "text", "What should people call you?", true);
+                } else if (step.id === "identity-status") {
+                    body = field("Your status (optional)", "status", config.status, "text", "A short line under your name", true);
+                } else if (step.id === "identity-stats") {
+                    body = `<div class="row" style="justify-content:space-between"><h3>Your stat bars</h3><button type="button" data-action="add-stat">+ Add stat</button></div>
+                        <p class="small">Pronouns, birthday, gender, or anything else you want to share. Leave anything blank to leave it off your page.</p>
                         <div class="card-list">${config.stats.map((stat, index) => `<div class="form-card"><div class="form-card-head"><strong>Stat ${index + 1}</strong><button class="danger" type="button" data-action="remove-stat" data-index="${index}">Remove</button></div>
-                            <div class="field-row">${arrayInput("stats", index, "label", "Label", stat.label, "text", true)}<div class="field"><label>Value type</label><select data-array="stats" data-index="${index}" data-key="type"><option value="text"${stat.type === "text" ? " selected" : ""}>Static text</option><option value="date"${stat.type === "date" ? " selected" : ""}>Date</option></select></div></div>
+                            <div class="field-row">${arrayInput("stats", index, "label", "Label", stat.label, "text", true)}<div class="field"><label>Value type</label><select data-array="stats" data-index="${index}" data-key="type"><option value="text"${stat.type === "text" ? " selected" : ""}>Text</option><option value="date"${stat.type === "date" ? " selected" : ""}>Date</option></select></div></div>
                             ${arrayInput("stats", index, "value", stat.type === "date" ? "Date" : "Value", stat.value, stat.type === "date" ? "date" : "text", stat.type !== "date")}
                             ${stat.type === "date" ? arrayInput("stats", index, "prefix", "Prefix (optional)", stat.prefix || "", "text", true) : ""}
-                            ${emojiPicker(`stats.${index}.label`)}</div>`).join("")}</div>`;
+                        </div>`).join("")}</div>`;
                 } else if (step.id === "badges") {
                     body = `<p>Select any badges you want to display. They are optional.</p><div class="card-list">${BADGES.map((badge) => `<label class="form-card inline-check"><input type="checkbox" data-badge="${escapeHtml(badge.name)}"${config.badges.includes(badge.name) ? " checked" : ""}><span><img src="${escapeHtml(badgeData.get(badge.name) || "")}" alt="" style="width:25px;height:25px;object-fit:contain;vertical-align:middle;margin-right:8px">${escapeHtml(badge.name)}</span></label>`).join("")}</div>`;
                 } else if (step.id === "bio") {
@@ -1303,7 +1414,11 @@
                         <div class="card-list" style="margin-top:14px">${config.extras.map((item, index) => `<div class="form-card"><div class="form-card-head"><strong>${escapeHtml(item.type)} container ${index + 1}</strong><div class="tiny-actions"><button type="button" data-action="move-extra" data-index="${index}" data-direction="-1" aria-label="Move up">↑</button><button type="button" data-action="move-extra" data-index="${index}" data-direction="1" aria-label="Move down">↓</button><button class="danger" type="button" data-action="remove-extra" data-index="${index}">Remove</button></div></div>
                         ${item.type === "button" ? `${arrayInput("extras", index, "text", "Container heading (optional)", item.text || "", "text", true)}${arrayInput("extras", index, "label", "Button label", item.label || "", "text", true)}${arrayInput("extras", index, "url", "URL (https://)", item.url || "", "url")}` : item.type === "image" ? `${arrayInput("extras", index, "text", "Image description / heading", item.text || "", "text", true)}<div class="field"><label>Choose image</label><input type="file" accept="image/*" data-extra-image="${index}"><span class="small">${item.image ? "Image selected." : "Up to 4 MB."}</span></div>${arrayInput("extras", index, "corners", "Corner roundness (0-40 px)", item.corners || 10, "number")}` : `${arrayInput("extras", index, "text", "Container text", item.text || "", "text", true)}<div class="field-row"><div class="field"><label>Alignment</label><select data-array="extras" data-index="${index}" data-key="alignment">${["left", "center", "right"].map((v) => `<option${item.alignment === v ? " selected" : ""}>${v}</option>`).join("")}</select></div>${arrayInput("extras", index, "size", "Font size (10-48 px)", item.size || 16, "number")}<div class="field"><label>Font family</label><select data-array="extras" data-index="${index}" data-key="font">${["inherit", "serif", "monospace", "Georgia", "Verdana"].map((v) => `<option${(item.font || "inherit") === v ? " selected" : ""}>${v}</option>`).join("")}</select></div></div>`}</div>`).join("")}</div>`;
                 }
-                wizardContent.innerHTML = `<div class="step-heading"><h1>${escapeHtml(step.title)}</h1><p>${escapeHtml(step.description)}</p></div><div class="wizard-question">${body}</div><div class="wizard-actions"><button class="secondary" type="button" data-action="previous"${stepIndex === 0 ? " disabled" : ""}>Back</button><div class="right"><button class="secondary" type="button" data-action="skip"${["timezone", "interests", "socials", "extras"].includes(step.id) ? "" : " disabled"}>Skip</button><button type="button" data-action="next">${stepIndex === STEPS.length - 1 ? "Finish setup" : "Continue"}</button></div></div>`;
+                const sameCategoryNext = STEPS[stepIndex + 1]?.category === step.category;
+                const nextLabel = stepIndex === STEPS.length - 1 ? "Finish setup" : sameCategoryNext ? "Next" : "Continue";
+                const canSkip = step.id !== "accent";
+                wizardContent.innerHTML = `<div class="step-heading"><h1>${escapeHtml(step.title)}</h1><p>${escapeHtml(step.description)}</p></div><div class="wizard-question">${body}</div><div class="wizard-actions"><button class="secondary" type="button" data-action="previous"${stepIndex === 0 ? " disabled" : ""}>Back</button><div class="right">${canSkip ? `<button class="secondary" type="button" data-action="skip">Skip</button>` : ""}<button type="button" data-action="next">${nextLabel}</button></div></div>`;
+                updateWizardNextButton();
                 renderPreview();
             }
 
@@ -1321,6 +1436,22 @@
             function updateField(target) {
                 const value = target.type === "checkbox" ? target.checked : target.value;
                 if (target.dataset.field) {
+                    if (target.dataset.field === "accent") {
+                        if (!/^#[0-9a-f]{6}$/i.test(value)) {
+                            updateWizardNextButton();
+                            return;
+                        }
+                        config.accent = value;
+                        const colorInput = wizardContent.querySelector("#accent-input");
+                        const hexInput = wizardContent.querySelector("#accent-hex");
+                        if (colorInput && colorInput !== target) colorInput.value = value;
+                        if (hexInput && hexInput !== target) hexInput.value = value;
+                        const colorControl = wizardContent.querySelector(".quiz-color-control");
+                        if (colorControl) colorControl.style.setProperty("--quiz-color", value);
+                        updateWizardNextButton();
+                        renderPreview();
+                        return;
+                    }
                     if (target.dataset.field === "interests.enabled") {
                         config.interests.enabled = target.checked;
                         if (!target.checked) config.interests.items = [];
@@ -1511,6 +1642,7 @@
                 const action = button.dataset.action;
                 if (action === "previous" && stepIndex > 0) stepIndex--;
                 if (action === "next") {
+                    if (STEPS[stepIndex].id === "accent" && !/^#[0-9a-f]{6}$/i.test($("#accent-hex").value)) return;
                     if (STEPS[stepIndex].id === "timezone" && !validateTimezoneConfirmation()) return;
                     if (stepIndex < STEPS.length - 1) stepIndex++;
                     else {
@@ -1759,14 +1891,34 @@
                             if (error.status !== 404 && !String(error.message).includes("Not Found")) throw error;
                             contents = [];
                         }
-                        if (!Array.isArray(contents) || contents.some((item) => item.type !== "file" || !/^readme(?:\.[^.]*)?$/i.test(item.name))) {
-                            throw new Error("For a new portfolio, this repository must be empty except for an optional README. No changes were made.");
+                        if (!Array.isArray(contents)) {
+                            throw new Error("GitHub did not return a valid list of repository files. No changes were made.");
                         }
-                        existingSha = null;
-                        managedPortfolio = false;
+                        const existingIndex = contents.find((item) => item.type === "file" && item.name.toLowerCase() === "index.html");
+                        if (existingIndex) {
+                            const confirmed = window.confirm(
+                                "This repository already has an index.html portfolio. Continuing will replace that file with a new portfolio when you publish. This cannot be undone from this page. Other existing files will be left alone, though custom emoji files you use may be added. Do you want to redo the setup?"
+                            );
+                            if (!confirmed) {
+                                showStatus(status, "Setup cancelled. Your existing portfolio was not changed.", "info");
+                                $("#connect-github").disabled = false;
+                                return;
+                            }
+                            const existingFile = await githubRequest(filePath);
+                            existingSha = existingFile.sha;
+                            managedPortfolio = true;
+                        } else {
+                            if (contents.some((item) => item.type !== "file" || !/^readme(?:\.[^.]*)?$/i.test(item.name))) {
+                                throw new Error("For a new portfolio, this repository must be empty except for an optional README, or already have a root index.html. No changes were made.");
+                            }
+                            existingSha = null;
+                            managedPortfolio = false;
+                        }
                         config = structuredClone(DEFAULTS);
                     }
-                    $("#connect-intro").textContent = `Connected to ${account}/${repoName}. The token is only used in this page session.`;
+                    $("#connect-intro").textContent = mode === "new" && managedPortfolio
+                        ? `Connected to ${account}/${repoName}. The existing index.html will only be replaced if you confirm publishing.`
+                        : `Connected to ${account}/${repoName}. The token is only used in this page session.`;
                     $("#connect-github").disabled = false;
                     if (mode === "edit") showView("editor");
                     else showView("wizard");
@@ -1824,6 +1976,86 @@
                 $("#refresh-publish-status").hidden = false;
             }
 
+            function buildState(status, conclusion) {
+                if (status === "in_progress") return "current";
+                if (status === "completed") return conclusion === "success" || conclusion === "neutral" || conclusion === "skipped" ? "done" : "error";
+                return "pending";
+            }
+
+            function buildStatusLabel(status, conclusion) {
+                if (status === "in_progress") return "In progress";
+                if (status !== "completed") return "Waiting";
+                if (conclusion === "success") return "Complete";
+                if (conclusion === "skipped" || conclusion === "neutral") return "Skipped";
+                return conclusion ? conclusion.replaceAll("_", " ") : "Failed";
+            }
+
+            function renderBuildProgress(jobs) {
+                const list = $("#publish-build-progress");
+                list.replaceChildren();
+                if (!jobs.length) {
+                    list.hidden = false;
+                    const item = document.createElement("li");
+                    item.className = "publish-build-job";
+                    item.textContent = "GitHub has not reported individual build jobs yet.";
+                    list.append(item);
+                    return;
+                }
+                list.hidden = false;
+                for (const job of jobs) {
+                    const item = document.createElement("li");
+                    item.className = "publish-build-job";
+                    item.dataset.state = buildState(job.status, job.conclusion);
+                    const name = document.createElement("span");
+                    name.className = "publish-build-job-name";
+                    name.textContent = job.name || "Build job";
+                    const state = document.createElement("span");
+                    state.textContent = buildStatusLabel(job.status, job.conclusion);
+                    item.append(name, state);
+                    const steps = Array.isArray(job.steps) ? job.steps : [];
+                    if (steps.length) {
+                        const stepList = document.createElement("ol");
+                        stepList.className = "publish-build-job-steps";
+                        for (const step of steps) {
+                            const stepItem = document.createElement("li");
+                            stepItem.dataset.state = buildState(step.status, step.conclusion);
+                            stepItem.textContent = `${step.name || "Step"}: ${buildStatusLabel(step.status, step.conclusion)}`;
+                            stepList.append(stepItem);
+                        }
+                        item.append(stepList);
+                    }
+                    list.append(item);
+                }
+            }
+
+            async function checkWorkflowJobs(owner, repoName, runId, generation) {
+                const list = $("#publish-build-progress");
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/actions/runs/${runId}/jobs?per_page=100`, {
+                        headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+                    });
+                    if (generation !== publishCheckGeneration) return;
+                    if (!response.ok) {
+                        list.replaceChildren();
+                        list.hidden = false;
+                        const item = document.createElement("li");
+                        item.textContent = `Individual job progress is unavailable (GitHub returned HTTP ${response.status}). Open the build on GitHub for details.`;
+                        list.append(item);
+                        return;
+                    }
+                    const result = await response.json();
+                    if (generation !== publishCheckGeneration) return;
+                    renderBuildProgress(Array.isArray(result.jobs) ? result.jobs : []);
+                } catch (error) {
+                    if (generation !== publishCheckGeneration) return;
+                    list.replaceChildren();
+                    list.hidden = false;
+                    const item = document.createElement("li");
+                    item.textContent = `Could not load individual job progress: ${error.message}`;
+                    list.append(item);
+                }
+            }
+
             async function checkPagesDeployment(commitSha, attempt, generation) {
                 if (generation !== publishCheckGeneration) return;
                 clearTimeout(publishCheckTimer);
@@ -1855,6 +2087,8 @@
                         const runId = encodeURIComponent(String(run.id));
                         $("#publish-actions-link").href = `https://github.com/${owner}/${repoName}/actions/runs/${runId}`;
                         $("#publish-actions-link").hidden = false;
+                        await checkWorkflowJobs(owner, repoName, runId, generation);
+                        if (generation !== publishCheckGeneration) return;
                         if (run.status === "completed") {
                             if (run.conclusion === "success") {
                                 setPublishStep("#publish-build-step", "done");
@@ -1880,6 +2114,7 @@
                         setPublishStep("#publish-build-step", "current");
                         $("#publish-title").textContent = "Waiting for GitHub to start the build";
                         $("#publish-detail").textContent = "GitHub has your changes. The Pages build starts when Pages is enabled for this repository.";
+                        renderBuildProgress([]);
                     }
                     if (attempt >= 24) {
                         showPublishRetry("If you have not enabled Pages yet, follow the steps below, then choose Check again.", "Still waiting for the Pages build");
@@ -1919,6 +2154,8 @@
                 setPublishStep("#publish-commit-step", "done");
                 setPublishStep("#publish-build-step", "current");
                 setPublishStep("#publish-live-step", "pending");
+                $("#publish-build-progress").replaceChildren();
+                $("#publish-build-progress").hidden = true;
 
                 const nextStep = document.createElement("div");
                 nextStep.className = "pages-next-step";
@@ -2046,7 +2283,7 @@
             $("#wizard-editor-button").addEventListener("click", () => showView("editor"));
             $("#edit-details-button").addEventListener("click", () => {
                 wizardFromEditor = true;
-                stepIndex = 0;
+                stepIndex = STEPS.findIndex((step) => step.id === "identity-name");
                 showView("wizard");
             });
             $("#editor-add-text").addEventListener("click", () => openExtraDialog(null, "text"));
@@ -2065,11 +2302,15 @@
                 if (!button) return;
                 if (button.dataset.editorAction === "profile") {
                     wizardFromEditor = true;
-                    stepIndex = 0;
+                    stepIndex = STEPS.findIndex((step) => step.id === "profile-picture");
                     showView("wizard");
                 } else if (button.dataset.editorStep) {
                     wizardFromEditor = true;
                     stepIndex = STEPS.findIndex((step) => step.id === button.dataset.editorStep);
+                    if (stepIndex < 0) {
+                        const targetId = button.dataset.editorStep === "profile" ? "profile-picture" : button.dataset.editorStep === "identity" ? "identity-name" : button.dataset.editorStep;
+                        stepIndex = STEPS.findIndex((step) => step.id === targetId);
+                    }
                     showView("wizard");
                 } else if (button.dataset.editorAction === "edit-extra") {
                     openExtraDialog(Number(button.dataset.index));
@@ -2127,6 +2368,16 @@
             wizardContent.addEventListener("click", (event) => {
                 const emoji = event.target.closest("[data-emoji]");
                 if (emoji) { insertEmoji(emoji.dataset.emojiTarget, emoji.dataset.emoji); return; }
+                const choice = event.target.closest("[data-choice]");
+                if (choice) {
+                    const value = choice.dataset.value;
+                    setPath(config, choice.dataset.choice, value);
+                    if (choice.dataset.choice === "profile.type" && value === "default" && config.profile.images.length > 1) {
+                        config.profile.images = config.profile.images.slice(0, 1);
+                    }
+                    renderWizard();
+                    return;
+                }
                 const action = event.target.closest("[data-action]");
                 if (action) handleAction(action);
             });
@@ -2139,6 +2390,9 @@
                 $("#publish-panel").classList.add("hidden");
                 $("#confirm-save").disabled = false;
                 $("#publish-target").textContent = `${account}/${repository.name}`;
+                $("#save-message").textContent = mode === "new" && managedPortfolio && existingSha
+                    ? "Confirming will replace this repository’s existing index.html portfolio with your new setup. This cannot be undone from this page. Continue?"
+                    : "By confirming, you allow this tool to use your PAT to update the selected repository. Continue?";
                 saveDialog.showModal();
             };
             $("#save-button").addEventListener("click", openSaveDialog);
