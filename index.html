@@ -226,6 +226,7 @@
         .publish-build-progress { flex: 1 0 calc(100% - 34px); display: grid; gap: 8px; margin: 12px 0 2px 31px; padding: 0; list-style: none; font-size: .88rem; }
         .publish-build-job { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 4px 10px; align-items: baseline; color: var(--muted); }
         .publish-build-job-name { color: var(--ink); font-weight: 700; }
+        a.publish-build-job-name { color: inherit; text-decoration: underline; text-decoration-color: #c9b8c0; text-underline-offset: 2px; }
         .publish-build-job[data-state="current"] .publish-build-job-name { color: #9a620c; }
         .publish-build-job[data-state="error"] .publish-build-job-name { color: #a22d45; }
         .publish-build-job-steps { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px 12px; margin: 0 0 2px; padding: 0; list-style: none; font-size: .78rem; }
@@ -589,6 +590,7 @@
             let publishCheckTimer = null;
             let publishCheckGeneration = 0;
             let currentPublishCommitSha = "";
+            let currentPublishRunId = "";
             const badgeData = new Map();
             let badgeAssetsLoad = null;
             let emojiCatalog = [];
@@ -1990,25 +1992,43 @@
                 return conclusion ? conclusion.replaceAll("_", " ") : "Failed";
             }
 
-            function renderBuildProgress(jobs) {
+            function renderBuildProgress(jobs, runUrl) {
                 const list = $("#publish-build-progress");
                 list.replaceChildren();
                 if (!jobs.length) {
                     list.hidden = false;
                     const item = document.createElement("li");
                     item.className = "publish-build-job";
-                    item.textContent = "GitHub has not reported individual build jobs yet.";
+                    item.textContent = "GitHub started the workflow. Waiting for its jobs to appear…";
                     list.append(item);
-                    return;
+                    return { complete: false, failed: false, running: 0, total: 0 };
                 }
                 list.hidden = false;
+                let running = 0;
+                let failed = false;
+                let complete = true;
                 for (const job of jobs) {
                     const item = document.createElement("li");
                     item.className = "publish-build-job";
                     item.dataset.state = buildState(job.status, job.conclusion);
-                    const name = document.createElement("span");
+                    if (job.status !== "completed") {
+                        complete = false;
+                        running++;
+                    }
+                    if (job.status === "completed" && !["success", "neutral", "skipped"].includes(job.conclusion)) failed = true;
+                    const jobHref = typeof job.html_url === "string" ? new URL(job.html_url) : null;
+                    const name = jobHref?.protocol === "https:" && jobHref.hostname === "github.com"
+                        ? document.createElement("a")
+                        : document.createElement("span");
                     name.className = "publish-build-job-name";
                     name.textContent = job.name || "Build job";
+                    if (name instanceof HTMLAnchorElement) {
+                        name.href = jobHref.href;
+                        name.target = "_blank";
+                        name.rel = "noopener noreferrer";
+                    } else if (runUrl) {
+                        name.title = `View this job in the GitHub Actions run`;
+                    }
                     const state = document.createElement("span");
                     state.textContent = buildStatusLabel(job.status, job.conclusion);
                     item.append(name, state);
@@ -2021,39 +2041,29 @@
                             stepItem.dataset.state = buildState(step.status, step.conclusion);
                             stepItem.textContent = `${step.name || "Step"}: ${buildStatusLabel(step.status, step.conclusion)}`;
                             stepList.append(stepItem);
+                            if (step.status === "in_progress") {
+                                item.dataset.state = "current";
+                            }
                         }
                         item.append(stepList);
                     }
                     list.append(item);
                 }
+                return { complete, failed, running, total: jobs.length };
             }
 
             async function checkWorkflowJobs(owner, repoName, runId, generation) {
-                const list = $("#publish-build-progress");
-                try {
-                    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/actions/runs/${runId}/jobs?per_page=100`, {
-                        headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
-                    });
-                    if (generation !== publishCheckGeneration) return;
-                    if (!response.ok) {
-                        list.replaceChildren();
-                        list.hidden = false;
-                        const item = document.createElement("li");
-                        item.textContent = `Individual job progress is unavailable (GitHub returned HTTP ${response.status}). Open the build on GitHub for details.`;
-                        list.append(item);
-                        return;
-                    }
-                    const result = await response.json();
-                    if (generation !== publishCheckGeneration) return;
-                    renderBuildProgress(Array.isArray(result.jobs) ? result.jobs : []);
-                } catch (error) {
-                    if (generation !== publishCheckGeneration) return;
-                    list.replaceChildren();
-                    list.hidden = false;
-                    const item = document.createElement("li");
-                    item.textContent = `Could not load individual job progress: ${error.message}`;
-                    list.append(item);
-                }
+                const endpoint = `https://api.github.com/repos/${owner}/${repoName}/actions/runs/${runId}/jobs?filter=latest&per_page=100&_=${Date.now()}`;
+                const response = await fetch(endpoint, {
+                    cache: "no-store",
+                    headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+                });
+                if (generation !== publishCheckGeneration) return null;
+                if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status} while listing the workflow jobs.`);
+                const result = await response.json();
+                if (generation !== publishCheckGeneration) return null;
+                const jobs = Array.isArray(result.jobs) ? result.jobs : [];
+                return renderBuildProgress(jobs, `https://github.com/${owner}/${repoName}/actions/runs/${runId}`);
             }
 
             async function checkPagesDeployment(commitSha, attempt, generation) {
@@ -2063,61 +2073,94 @@
                 $("#refresh-publish-status").hidden = true;
                 const owner = encodeURIComponent(account);
                 const repoName = encodeURIComponent(repository.name);
-                const runsUrl = `https://api.github.com/repos/${owner}/${repoName}/actions/runs?head_sha=${encodeURIComponent(commitSha)}&per_page=20`;
                 try {
-                    const response = await fetch(runsUrl, {
-                        headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
-                    });
-                    if (generation !== publishCheckGeneration) return;
-                    if (!response.ok) {
-                        if (response.status === 404 || response.status === 403) {
-                            showPublishRetry("GitHub did not allow a public build-status check. This can happen when the repository is private or the API is limiting requests. This page will not use your token for Actions access. Open Actions to check the build.", "Build status unavailable");
-                            return;
-                        }
-                        throw new Error(`GitHub returned HTTP ${response.status} while checking the build.`);
-                    }
-                    const result = await response.json();
-                    if (generation !== publishCheckGeneration) return;
-                    const runs = Array.isArray(result.workflow_runs) ? result.workflow_runs : [];
-                    const run = runs.find((item) =>
-                        item.head_sha === commitSha &&
-                        (`${item.name || ""} ${item.path || ""}`).toLowerCase().includes("pages")
-                    );
-                    if (run) {
-                        const runId = encodeURIComponent(String(run.id));
-                        $("#publish-actions-link").href = `https://github.com/${owner}/${repoName}/actions/runs/${runId}`;
-                        $("#publish-actions-link").hidden = false;
-                        await checkWorkflowJobs(owner, repoName, runId, generation);
+                    let runId = currentPublishRunId;
+                    if (!runId) {
+                        const runsUrl = `https://api.github.com/repos/${owner}/${repoName}/actions/runs?head_sha=${encodeURIComponent(commitSha)}&per_page=20&_=${Date.now()}`;
+                        const response = await fetch(runsUrl, {
+                            cache: "no-store",
+                            headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+                        });
                         if (generation !== publishCheckGeneration) return;
-                        if (run.status === "completed") {
-                            if (run.conclusion === "success") {
-                                setPublishStep("#publish-build-step", "done");
-                                setPublishStep("#publish-live-step", "done");
-                                $("#publish-title").textContent = "Your portfolio is live!";
-                                $("#publish-detail").textContent = "GitHub finished building and publishing your site.";
-                                $("#visit-portfolio-link").href = pagesSiteUrl();
-                                $("#visit-portfolio-link").hidden = false;
-                                $("#copy-portfolio-link").hidden = false;
-                                $("#pages-setup-instructions").hidden = true;
-                            } else {
-                                setPublishStep("#publish-build-step", "error");
-                                $("#publish-title").textContent = "GitHub could not publish the site";
-                                $("#publish-detail").textContent = `The Pages build finished with status “${run.conclusion || "unknown"}”. Open the build on GitHub to see what went wrong.`;
-                                $("#refresh-publish-status").hidden = false;
-                            }
-                            return;
+                        if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status} while looking for the Pages workflow.`);
+                        const result = await response.json();
+                        if (generation !== publishCheckGeneration) return;
+                        const runs = Array.isArray(result.workflow_runs) ? result.workflow_runs : [];
+                        const run = runs.find((item) =>
+                            item.head_sha === commitSha &&
+                            (`${item.name || ""} ${item.path || ""}`).toLowerCase().includes("pages")
+                        );
+                        if (run) {
+                            runId = String(run.id);
+                            currentPublishRunId = runId;
                         }
-                        setPublishStep("#publish-build-step", "current");
-                        $("#publish-title").textContent = "GitHub is building your website";
-                        $("#publish-detail").textContent = "This can take a little while. You can leave this window open or view the live build on GitHub.";
-                    } else {
+                    }
+                    if (!runId) {
                         setPublishStep("#publish-build-step", "current");
                         $("#publish-title").textContent = "Waiting for GitHub to start the build";
-                        $("#publish-detail").textContent = "GitHub has your changes. The Pages build starts when Pages is enabled for this repository.";
-                        renderBuildProgress([]);
+                        $("#publish-detail").textContent = "GitHub has your changes. Waiting for the Pages workflow for this commit to start.";
+                        const list = $("#publish-build-progress");
+                        list.replaceChildren();
+                        list.hidden = false;
+                        const item = document.createElement("li");
+                        item.className = "publish-build-job";
+                        item.textContent = "Waiting for GitHub Pages to start this commit’s workflow…";
+                        list.append(item);
+                        if (attempt >= 60) {
+                            showPublishRetry("GitHub has not started the Pages workflow yet. Check that Pages is enabled, then choose Check again.", "Still waiting for the Pages build");
+                            return;
+                        }
+                        const delay = Math.min(5000 * (1 + Math.floor(attempt / 3)), 20000);
+                        publishCheckTimer = window.setTimeout(
+                            () => checkPagesDeployment(commitSha, attempt + 1, generation),
+                            delay
+                        );
+                        return;
                     }
-                    if (attempt >= 24) {
-                        showPublishRetry("If you have not enabled Pages yet, follow the steps below, then choose Check again.", "Still waiting for the Pages build");
+
+                    $("#publish-actions-link").href = `https://github.com/${owner}/${repoName}/actions/runs/${encodeURIComponent(runId)}`;
+                    $("#publish-actions-link").hidden = false;
+                    let progress;
+                    try {
+                        progress = await checkWorkflowJobs(owner, repoName, encodeURIComponent(runId), generation);
+                    } catch (error) {
+                        if (generation !== publishCheckGeneration) return;
+                        const list = $("#publish-build-progress");
+                        list.replaceChildren();
+                        list.hidden = false;
+                        const item = document.createElement("li");
+                        item.className = "publish-build-job";
+                        item.textContent = `Could not load live job progress: ${error.message} Open the build on GitHub to check it.`;
+                        list.append(item);
+                        showPublishRetry(`The public Actions job status could not be read: ${error.message}`, "Build status unavailable");
+                        return;
+                    }
+                    if (generation !== publishCheckGeneration || !progress) return;
+                    setPublishStep("#publish-build-step", "current");
+                    $("#publish-title").textContent = "GitHub is building your website";
+                    if (progress.complete && progress.total > 0) {
+                        if (progress.failed) {
+                            setPublishStep("#publish-build-step", "error");
+                            $("#publish-title").textContent = "GitHub could not publish the site";
+                            $("#publish-detail").textContent = "A Pages workflow job failed. Open the job above to see the exact step and error.";
+                            $("#refresh-publish-status").hidden = false;
+                            return;
+                        }
+                        setPublishStep("#publish-build-step", "done");
+                        setPublishStep("#publish-live-step", "done");
+                        $("#publish-title").textContent = "Your portfolio is live!";
+                        $("#publish-detail").textContent = "All GitHub Pages jobs and steps have finished successfully.";
+                        $("#visit-portfolio-link").href = pagesSiteUrl();
+                        $("#visit-portfolio-link").hidden = false;
+                        $("#copy-portfolio-link").hidden = false;
+                        $("#pages-setup-instructions").hidden = true;
+                        return;
+                    }
+                    $("#publish-detail").textContent = progress.total
+                        ? `${progress.running} of ${progress.total} jobs still running. Job and step statuses refresh automatically.`
+                        : "The Pages workflow has started. Waiting for GitHub to report its jobs and steps…";
+                    if (attempt >= 120) {
+                        showPublishRetry("Live job updates have paused. Open the workflow on GitHub or choose Check again to resume.", "Build status needs a check");
                         return;
                     }
                     publishCheckTimer = window.setTimeout(
@@ -2126,7 +2169,7 @@
                     );
                 } catch (error) {
                     if (generation !== publishCheckGeneration) return;
-                    showPublishRetry(`Could not check the Pages build: ${error.message} You can open Actions on GitHub to check it instead.`, "Could not check the build");
+                    showPublishRetry(`Could not check the public Pages workflow: ${error.message} You can open Actions on GitHub to check it instead.`, "Could not check the build");
                 }
             }
 
@@ -2137,6 +2180,7 @@
                 clearTimeout(publishCheckTimer);
                 publishCheckTimer = null;
                 currentPublishCommitSha = commitSha;
+                currentPublishRunId = "";
                 const saved = document.createElement("p");
                 saved.textContent = `Saved to ${account}/${repository.name}.`;
                 status.append(saved);
@@ -2386,6 +2430,7 @@
                 publishCheckTimer = null;
                 publishCheckGeneration++;
                 currentPublishCommitSha = "";
+                currentPublishRunId = "";
                 $("#save-status").textContent = "";
                 $("#publish-panel").classList.add("hidden");
                 $("#confirm-save").disabled = false;
